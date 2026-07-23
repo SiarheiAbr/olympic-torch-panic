@@ -120,7 +120,9 @@ describe('flame integrity', () => {
     const state = makeRunningState();
     state.flame.integrity = 5;
     state.torch.angle = 0;
-    state.hazards = [hazardFrame({ type: 'DRONE_DOWNDRAFT', approachAngle: 135, activeSeconds: 1 })];
+    state.hazards = [
+      hazardFrame({ type: 'DRONE_DOWNDRAFT', approachAngle: 135, activeSeconds: 1 }),
+    ];
     flameIntegrity.update(state, 1 / 60);
     assert.equal(state.flame.integrity, 0);
     assert.equal(state.flame.state, FLAME_STATE.EXTINGUISHED);
@@ -141,7 +143,9 @@ describe('flame integrity', () => {
     state.flame.integrity = 50;
     state.regen.timeSinceLoss = 10;
     state.torch.angle = 0;
-    state.hazards = [hazardFrame({ type: 'RAIN_SHOWER', approachAngle: 90, activeSeconds: 1 / 60 })];
+    state.hazards = [
+      hazardFrame({ type: 'RAIN_SHOWER', approachAngle: 90, activeSeconds: 1 / 60 }),
+    ];
     flameIntegrity.update(state, 1 / 60);
     assert.ok(state.flame.integrity < 50);
   });

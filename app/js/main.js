@@ -43,7 +43,9 @@ function persist() {
   const ok = store.save(saveDoc);
   if (!ok && !storageNoticeShown) {
     storageNoticeShown = true;
-    screens.showNotice('Records can’t be saved on this device — scores last only for this session.');
+    screens.showNotice(
+      'Records can’t be saved on this device — scores last only for this session.'
+    );
   }
 }
 
@@ -195,7 +197,9 @@ function render(s, dt) {
       (s.run
         ? `dist ${s.run.distance.toFixed(1)} m | t ${s.run.elapsedTime.toFixed(1)} s | env ${s.run.environmentIndex + 1}\n`
         : '') +
-      s.hazards.map((h) => `${h.type}@${h.approachAngle}° ${h.state}${h.blocked ? ' [blocked]' : ''}`).join('\n');
+      s.hazards
+        .map((h) => `${h.type}@${h.approachAngle}° ${h.state}${h.blocked ? ' [blocked]' : ''}`)
+        .join('\n');
   }
 }
 

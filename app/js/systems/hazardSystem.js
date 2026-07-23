@@ -85,7 +85,10 @@ function progressHazard(hazard, dt) {
     const before = hazard.activeElapsed;
     hazard.activeElapsed += remainingFrameTime;
     // REQ-HAZ-003: dangerous for exactly the active duration.
-    hazard.activeSecondsThisFrame = Math.min(remainingFrameTime, Math.max(0, def.duration - before));
+    hazard.activeSecondsThisFrame = Math.min(
+      remainingFrameTime,
+      Math.max(0, def.duration - before)
+    );
     if (hazard.activeElapsed >= def.duration) hazard.state = HAZARD_STATE.RESOLVED;
   } else {
     hazard.activeElapsed += remainingFrameTime;

@@ -103,7 +103,8 @@ export function recordRun(run, saveDoc, now) {
   return {
     entry,
     qualifies: q,
-    metersShort: !q && saveDoc.leaderboard.length > 0 ? metersShort(saveDoc.leaderboard, entry) : null,
+    metersShort:
+      !q && saveDoc.leaderboard.length > 0 ? metersShort(saveDoc.leaderboard, entry) : null,
     newLongestSurvival,
   };
 }

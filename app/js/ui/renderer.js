@@ -131,8 +131,8 @@ export function createRenderer(canvas) {
 
   function drawShieldArc(cx, cy, torchAngle) {
     // Canvas angles are clockwise with y down; business angles are CCW with y up.
-    const start = ((-(torchAngle + SHIELD_HALF_ARC)) * Math.PI) / 180;
-    const end = ((-(torchAngle - SHIELD_HALF_ARC)) * Math.PI) / 180;
+    const start = (-(torchAngle + SHIELD_HALF_ARC) * Math.PI) / 180;
+    const end = (-(torchAngle - SHIELD_HALF_ARC) * Math.PI) / 180;
     ctx2d.strokeStyle = 'rgba(255,255,255,0.65)';
     ctx2d.lineWidth = 5;
     ctx2d.beginPath();
@@ -220,7 +220,10 @@ export function createRenderer(canvas) {
         const ox = -d.y * (i * 12 + jitter * 0.3);
         const oy = d.x * (i * 12 + jitter * 0.3);
         ctx2d.beginPath();
-        ctx2d.moveTo(cx + d.x * (TELEGRAPH_RADIUS - 10) + ox, cy + d.y * (TELEGRAPH_RADIUS - 10) + oy);
+        ctx2d.moveTo(
+          cx + d.x * (TELEGRAPH_RADIUS - 10) + ox,
+          cy + d.y * (TELEGRAPH_RADIUS - 10) + oy
+        );
         ctx2d.lineTo(cx + d.x * stopRadius + ox, cy + d.y * stopRadius + oy);
         ctx2d.stroke();
       }

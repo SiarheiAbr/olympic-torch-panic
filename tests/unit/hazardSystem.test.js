@@ -56,7 +56,13 @@ describe('hazard system', () => {
     const windOnly = {
       ...ENVIRONMENTS[4],
       maxConcurrentHazards: 5,
-      weights: { WIND_GUST: 100, RAIN_SHOWER: 0, DRONE_DOWNDRAFT: 0, BEACH_BALL: 0, FIREWORKS_BURST: 0 },
+      weights: {
+        WIND_GUST: 100,
+        RAIN_SHOWER: 0,
+        DRONE_DOWNDRAFT: 0,
+        BEACH_BALL: 0,
+        FIREWORKS_BURST: 0,
+      },
     };
     const rng = createRng(2);
     const first = hazardSystem.attemptSpawn(state, windOnly, rng);
@@ -67,7 +73,13 @@ describe('hazard system', () => {
   });
 
   it('REQ-HAZ-006: type mix follows the environment weights (seeded statistics)', () => {
-    const counts = { WIND_GUST: 0, RAIN_SHOWER: 0, DRONE_DOWNDRAFT: 0, BEACH_BALL: 0, FIREWORKS_BURST: 0 };
+    const counts = {
+      WIND_GUST: 0,
+      RAIN_SHOWER: 0,
+      DRONE_DOWNDRAFT: 0,
+      BEACH_BALL: 0,
+      FIREWORKS_BURST: 0,
+    };
     const rng = createRng(1234);
     const draws = 600;
     for (let i = 0; i < draws; i++) {
@@ -89,7 +101,13 @@ describe('hazard system', () => {
     const rng = createRng(3);
     const gustEnv = {
       ...ENVIRONMENTS[0],
-      weights: { WIND_GUST: 100, RAIN_SHOWER: 0, DRONE_DOWNDRAFT: 0, BEACH_BALL: 0, FIREWORKS_BURST: 0 },
+      weights: {
+        WIND_GUST: 100,
+        RAIN_SHOWER: 0,
+        DRONE_DOWNDRAFT: 0,
+        BEACH_BALL: 0,
+        FIREWORKS_BURST: 0,
+      },
     };
     const hazard = hazardSystem.attemptSpawn(state, gustEnv, rng);
     const def = HAZARD_TYPES.WIND_GUST;
@@ -118,7 +136,13 @@ describe('hazard system', () => {
     const rng = createRng(4);
     const fwEnv = {
       ...ENVIRONMENTS[4],
-      weights: { WIND_GUST: 0, RAIN_SHOWER: 0, DRONE_DOWNDRAFT: 0, BEACH_BALL: 0, FIREWORKS_BURST: 100 },
+      weights: {
+        WIND_GUST: 0,
+        RAIN_SHOWER: 0,
+        DRONE_DOWNDRAFT: 0,
+        BEACH_BALL: 0,
+        FIREWORKS_BURST: 100,
+      },
     };
     const hazard = hazardSystem.attemptSpawn(state, fwEnv, rng);
     const ctx = makeCtx();
@@ -131,7 +155,7 @@ describe('hazard system', () => {
       // count only while the hazard is still live — a removed hazard's
       // per-frame arrays are stale leftovers from its final frame
       if (state.hazards.includes(hazard)) {
-        for (const _ of hazard.impactsThisFrame) impactTimes.push(t);
+        for (let k = 0; k < hazard.impactsThisFrame.length; k++) impactTimes.push(t);
       }
     }
     assert.equal(impactTimes.length, 3);
@@ -146,7 +170,13 @@ describe('hazard system', () => {
     const rng = createRng(5);
     const ballEnv = {
       ...ENVIRONMENTS[0],
-      weights: { WIND_GUST: 0, RAIN_SHOWER: 0, DRONE_DOWNDRAFT: 0, BEACH_BALL: 100, FIREWORKS_BURST: 0 },
+      weights: {
+        WIND_GUST: 0,
+        RAIN_SHOWER: 0,
+        DRONE_DOWNDRAFT: 0,
+        BEACH_BALL: 100,
+        FIREWORKS_BURST: 0,
+      },
     };
     const hazard = hazardSystem.attemptSpawn(state, ballEnv, rng);
     const ctx = makeCtx();
