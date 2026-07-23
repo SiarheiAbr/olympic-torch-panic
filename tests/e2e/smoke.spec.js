@@ -39,6 +39,17 @@ test.describe('smoke', () => {
     expect(await page.locator('#hud-distance').textContent()).not.toBe(pausedDistance);
   });
 
+  test('How to Play opens from the menu and closes back to it', async ({ page }) => {
+    await page.goto('/?seed=42');
+    await page.click('#btn-menu-howto');
+    await expect(page.locator('#screen-howto')).toBeVisible();
+    await expect(page.locator('#screen-howto h2')).toHaveText('How to Play');
+    await expect(page.locator('.howto-hazards li')).toHaveCount(5);
+    await page.click('#btn-howto-back');
+    await expect(page.locator('#screen-howto')).toBeHidden();
+    await expect(page.locator('#screen-menu')).toBeVisible();
+  });
+
   test('quit from pause returns to the menu without recording a score', async ({ page }) => {
     await page.goto('/?seed=42');
     await page.click('#btn-start');

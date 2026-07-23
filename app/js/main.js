@@ -80,6 +80,7 @@ const screens = createScreens({
     leaderboardBody: $('leaderboard-body'),
     leaderboardRecord: $('leaderboard-record'),
     leaderboardEmpty: $('leaderboard-empty'),
+    howToScreen: $('screen-howto'),
     notice: $('toast-notice'),
   },
   getSaveDoc: () => saveDoc,
@@ -126,6 +127,8 @@ createInput({ state, playArea: canvas, commands });
 $('btn-start').addEventListener('click', startRun);
 $('btn-menu-leaderboard').addEventListener('click', () => screens.showLeaderboard());
 $('btn-leaderboard-back').addEventListener('click', () => screens.hideLeaderboard());
+$('btn-menu-howto').addEventListener('click', () => screens.showHowTo());
+$('btn-howto-back').addEventListener('click', () => screens.hideHowTo());
 $('btn-resume').addEventListener('click', () => runLifecycle.beginResume(state));
 $('btn-quit').addEventListener('click', () => {
   runLifecycle.quitToMenu(state); // REQ-RUN-010: no ScoreEntry

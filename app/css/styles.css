@@ -119,6 +119,8 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  /* `safe` keeps the top reachable when content is taller than the viewport */
+  justify-content: safe center;
   gap: 14px;
   text-align: center;
   padding: 24px;
@@ -126,7 +128,7 @@ body {
 }
 
 .screen {
-  background: rgba(10, 14, 22, 0.88);
+  background: #0d111a;
 }
 
 .overlay {
@@ -251,6 +253,37 @@ body {
 .leaderboard-record {
   color: #ffd27a;
   font-weight: 600;
+}
+
+/* ---------- How to Play ---------- */
+
+.howto-content {
+  max-width: min(600px, 90vw);
+  text-align: left;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.howto-content h3 {
+  margin-top: 14px;
+  margin-bottom: 4px;
+  color: #ffd27a;
+  font-size: 1.05rem;
+}
+
+.howto-content p {
+  margin-bottom: 6px;
+  opacity: 0.9;
+}
+
+.howto-hazards {
+  list-style: none;
+  margin-bottom: 6px;
+}
+
+.howto-hazards li {
+  padding: 2px 0;
+  opacity: 0.9;
 }
 
 .results-buttons {

@@ -51,6 +51,7 @@ export function createScreens({ els, getSaveDoc }) {
       hide(els.countdownOverlay);
       hide(els.endOverlay);
       hide(els.leaderboardScreen);
+      hide(els.howToScreen);
       show(els.menu);
       const doc = getSaveDoc();
       els.menuBest.textContent =
@@ -63,6 +64,7 @@ export function createScreens({ els, getSaveDoc }) {
       hide(els.menu);
       hide(els.results);
       hide(els.leaderboardScreen);
+      hide(els.howToScreen);
       hide(els.endOverlay);
       show(els.hud);
     },
@@ -75,6 +77,14 @@ export function createScreens({ els, getSaveDoc }) {
 
     hideLeaderboard() {
       hide(els.leaderboardScreen);
+    },
+
+    showHowTo() {
+      show(els.howToScreen);
+    },
+
+    hideHowTo() {
+      hide(els.howToScreen);
     },
 
     /**
