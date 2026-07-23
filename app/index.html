@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <title>Olympic Torch Panic</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="game-canvas"></canvas>
+
+      <div id="hud" class="hidden">
+        <div class="hud-row">
+          <span id="hud-distance" class="hud-distance">0 m</span>
+          <span id="hud-environment" class="hud-environment"></span>
+        </div>
+        <div id="hud-gauge" class="hud-gauge gauge-strong">
+          <div id="hud-gauge-fill" class="hud-gauge-fill"></div>
+        </div>
+        <div id="hud-banner" class="hud-banner hidden"></div>
+      </div>
+
+      <section id="screen-menu" class="screen">
+        <h1 class="game-title">🔥 Olympic Torch Panic</h1>
+        <p class="game-tagline">Carry the flame to LA. Shield it or lose it.</p>
+        <p id="menu-best" class="menu-best"></p>
+        <button id="btn-start" class="btn btn-primary">Start Run</button>
+        <button id="btn-menu-leaderboard" class="btn">Leaderboard</button>
+        <div class="controls-help">
+          <p><strong>Desktop:</strong> move the mouse left/right or hold A / D</p>
+          <p><strong>Mobile:</strong> drag left/right</p>
+          <p>The torch blocks hazards only on the side it faces. Watch the warnings!</p>
+        </div>
+      </section>
+
+      <section id="screen-leaderboard" class="screen hidden">
+        <h2>Leaderboard</h2>
+        <p id="leaderboard-record" class="leaderboard-record"></p>
+        <p id="leaderboard-empty" class="board-empty hidden">No runs recorded yet.</p>
+        <table class="board-table">
+          <thead>
+            <tr><th>#</th><th>Who</th><th>Distance</th><th>Survival</th><th></th><th>Date</th></tr>
+          </thead>
+          <tbody id="leaderboard-body"></tbody>
+        </table>
+        <button id="btn-leaderboard-back" class="btn">Back</button>
+      </section>
+
+      <div id="overlay-pause" class="overlay hidden">
+        <h2>Paused</h2>
+        <button id="btn-resume" class="btn btn-primary">Resume</button>
+        <button id="btn-quit" class="btn">Quit to Menu</button>
+      </div>
+
+      <div id="overlay-countdown" class="overlay overlay-countdown hidden">
+        <span id="countdown-number">3</span>
+      </div>
+
+      <div id="overlay-end" class="overlay overlay-end hidden"></div>
+
+      <section id="screen-results" class="screen hidden">
+        <h2>Run Complete</h2>
+        <p id="result-distance" class="result-distance">0 m</p>
+        <p id="result-time" class="result-time"></p>
+        <p id="result-badge" class="result-badge hidden">🏆 Reached LA with the flame alive!</p>
+        <p id="result-record" class="result-record hidden">🔥 New Longest Flame Survival!</p>
+        <p id="result-message" class="result-message"></p>
+        <form id="initials-form" class="initials-form hidden">
+          <label for="initials-input">Your initials:</label>
+          <input
+            id="initials-input"
+            maxlength="3"
+            placeholder="YOU"
+            autocomplete="off"
+            pattern="[A-Za-z0-9]{3}"
+          />
+          <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+        <p id="results-board-empty" class="board-empty hidden">No runs recorded yet.</p>
+        <table class="board-table">
+          <thead>
+            <tr><th>#</th><th>Who</th><th>Distance</th><th>Survival</th><th></th><th>Date</th></tr>
+          </thead>
+          <tbody id="results-board-body"></tbody>
+        </table>
+        <div class="results-buttons">
+          <button id="btn-retry" class="btn btn-primary">Retry</button>
+          <button id="btn-results-menu" class="btn">Main Menu</button>
+        </div>
+      </section>
+
+      <div id="toast-notice" class="toast hidden"></div>
+      <pre id="debug-overlay" class="debug-overlay hidden"></pre>
+    </div>
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
