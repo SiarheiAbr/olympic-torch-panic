@@ -3,8 +3,8 @@
 // (specification/business/01-foundation/data-model/spec.md § Tuning Parameters).
 
 export const TOTAL_DISTANCE = 5000; // meters to LA (victory)
-export const BASE_SPEED = 5; // m/s in environment 1
-export const SPEED_INCREMENT = 0.5; // m/s added per environment stage
+export const BASE_SPEED = 8; // m/s in environment 1 (raised from 5 to quicken pacing)
+export const SPEED_INCREMENT = 1.0; // m/s added per environment stage (raised from 0.5)
 export const SHIELD_HALF_ARC = 60; // degrees; blocking comparison is inclusive
 export const KEY_ROTATION_SPEED = 180; // degrees/s while A or D held
 export const REGEN_RATE = 8; // integrity/s during calm

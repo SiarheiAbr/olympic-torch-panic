@@ -53,6 +53,7 @@ const canvas = /** @type {HTMLCanvasElement} */ (document.getElementById('game-c
 const renderer = createRenderer(canvas);
 const hud = createHud({
   distance: $('hud-distance'),
+  distanceRemaining: $('hud-distance-remaining'),
   environment: $('hud-environment'),
   gauge: $('hud-gauge'),
   gaugeFill: $('hud-gauge-fill'),

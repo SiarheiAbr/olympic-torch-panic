@@ -47,8 +47,34 @@ body {
 .hud-row {
   display: flex;
   justify-content: space-between;
+  gap: 12px;
   font-size: 1.1rem;
   font-weight: 600;
+}
+
+.hud-distance-group {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Secondary, dimmer read-out so the finish-line distance stays uncluttered. */
+.hud-distance-remaining {
+  font-size: 0.85em;
+  font-weight: 500;
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
+.hud-distance-remaining::before {
+  content: '•';
+  margin-right: 8px;
+  opacity: 0.6;
+}
+
+.hud-distance-remaining:empty {
+  display: none;
 }
 
 .hud-gauge {
