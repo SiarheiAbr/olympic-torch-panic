@@ -2,7 +2,7 @@
 // REQ-RUN-011: distance (whole meters), integrity gauge, environment name,
 // visible at all times while RUNNING. Also shows the stage banner (REQ-RUN-005).
 
-import { ENVIRONMENTS } from '../core/tuning.js';
+import { ENVIRONMENTS, TOTAL_DISTANCE } from '../core/tuning.js';
 import { FLAME_STATE } from '../core/state.js';
 
 const GAUGE_CLASS_BY_FLAME_STATE = {
@@ -15,6 +15,7 @@ const GAUGE_CLASS_BY_FLAME_STATE = {
 /**
  * @param {Object} els
  * @param {HTMLElement} els.distance
+ * @param {HTMLElement} els.distanceRemaining
  * @param {HTMLElement} els.environment
  * @param {HTMLElement} els.gauge
  * @param {HTMLElement} els.gaugeFill
@@ -25,7 +26,12 @@ export function createHud(els) {
     /** @param {import('../core/state.js').GameState} state */
     update(state) {
       if (!state.run) return;
-      els.distance.textContent = `${Math.floor(state.run.distance)} m`;
+      // REQ-RUN-011: distance covered, plus how far remains to the finish line.
+      // parseInt on the element text still reads `covered` first (see e2e smoke test).
+      const covered = Math.floor(state.run.distance);
+      const remaining = Math.max(0, TOTAL_DISTANCE - covered);
+      els.distance.textContent = `${covered} m`;
+      els.distanceRemaining.textContent = `${remaining} m remaining`;
       els.environment.textContent = ENVIRONMENTS[state.run.environmentIndex].name;
       els.gaugeFill.style.width = `${state.flame.integrity}%`;
       els.gauge.className = `hud-gauge ${GAUGE_CLASS_BY_FLAME_STATE[state.flame.state] || 'gauge-strong'}`;
