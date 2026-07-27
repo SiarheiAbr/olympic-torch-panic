@@ -3,8 +3,10 @@
 // (specification/business/01-foundation/data-model/spec.md § Tuning Parameters).
 
 export const TOTAL_DISTANCE = 5000; // meters to LA (victory)
-export const BASE_SPEED = 8; // m/s in environment 1 (raised from 5 to quicken pacing)
-export const SPEED_INCREMENT = 1.0; // m/s added per environment stage (raised from 0.5)
+// Pacing target: a clean run finishes in ~2.5 minutes (sum of 1000 m / speed
+// per stage ≈ 149 s), so a "one more try" loop stays short and punchy.
+export const BASE_SPEED = 25; // m/s in environment 1
+export const SPEED_INCREMENT = 5; // m/s added per environment stage
 export const SHIELD_HALF_ARC = 60; // degrees; blocking comparison is inclusive
 export const KEY_ROTATION_SPEED = 180; // degrees/s while A or D held
 export const REGEN_RATE = 8; // integrity/s during calm
@@ -68,14 +70,16 @@ export const HAZARD_TYPES = Object.freeze({
  * Environment table (specification/business/03-run-lifecycle/spec.md).
  * Stages split TOTAL_DISTANCE into equal fifths; boundaries scale with it.
  * `weights` are the hazard-mix spawn weights (each row sums to 100).
+ * Spawn intervals are tightened versus the original spec numbers so hazard
+ * density per second stays challenging at the faster run pace above.
  */
 export const ENVIRONMENTS = Object.freeze(
   [
     {
       name: 'Countryside Send-off',
       maxConcurrentHazards: 1,
-      spawnIntervalMin: 3.5,
-      spawnIntervalMax: 5.0,
+      spawnIntervalMin: 2.5,
+      spawnIntervalMax: 3.5,
       weights: {
         WIND_GUST: 50,
         RAIN_SHOWER: 30,
@@ -87,8 +91,8 @@ export const ENVIRONMENTS = Object.freeze(
     {
       name: 'Storm Coast',
       maxConcurrentHazards: 2,
-      spawnIntervalMin: 3.0,
-      spawnIntervalMax: 4.5,
+      spawnIntervalMin: 2.0,
+      spawnIntervalMax: 3.0,
       weights: {
         WIND_GUST: 30,
         RAIN_SHOWER: 40,
@@ -100,8 +104,8 @@ export const ENVIRONMENTS = Object.freeze(
     {
       name: 'Desert Highway',
       maxConcurrentHazards: 2,
-      spawnIntervalMin: 2.5,
-      spawnIntervalMax: 4.0,
+      spawnIntervalMin: 1.6,
+      spawnIntervalMax: 2.4,
       weights: {
         WIND_GUST: 35,
         RAIN_SHOWER: 0,
@@ -113,8 +117,8 @@ export const ENVIRONMENTS = Object.freeze(
     {
       name: 'Venice Beach Boardwalk',
       maxConcurrentHazards: 3,
-      spawnIntervalMin: 2.0,
-      spawnIntervalMax: 3.0,
+      spawnIntervalMin: 1.3,
+      spawnIntervalMax: 2.0,
       weights: {
         WIND_GUST: 20,
         RAIN_SHOWER: 15,
@@ -126,8 +130,8 @@ export const ENVIRONMENTS = Object.freeze(
     {
       name: 'Downtown LA',
       maxConcurrentHazards: 3,
-      spawnIntervalMin: 1.5,
-      spawnIntervalMax: 2.5,
+      spawnIntervalMin: 1.0,
+      spawnIntervalMax: 1.6,
       weights: {
         WIND_GUST: 20,
         RAIN_SHOWER: 10,

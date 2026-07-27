@@ -96,9 +96,11 @@ export function createRenderer(canvas) {
     ctx2d.fillRect(0, groundY, w, h - groundY);
 
     // Road dashes scroll with distance to sell the automatic forward movement.
+    // The px-per-meter factor is tuned for ~25-45 m/s run speeds: fast enough
+    // to feel quick, slow enough that dashes glide instead of strobing.
     const distance = state.run ? state.run.distance : 0;
     const spacing = 90;
-    const offset = (distance * 30) % spacing;
+    const offset = (distance * 12) % spacing;
     ctx2d.fillStyle = 'rgba(255,255,255,0.55)';
     for (let x = -offset; x < w; x += spacing) {
       ctx2d.fillRect(x, groundY + (h - groundY) * 0.45, 42, 5);
@@ -107,7 +109,9 @@ export function createRenderer(canvas) {
 
   function drawRunner(cx, cy, groundY, state) {
     const distance = state.run.distance;
-    const phase = distance * 2.2;
+    // Rad-per-meter tuned for ~25-45 m/s: a brisk 3-5 stride cycles per
+    // second rather than a blur of limbs.
+    const phase = distance * 0.7;
     ctx2d.strokeStyle = '#2b2b2b';
     ctx2d.lineWidth = 4;
     ctx2d.lineCap = 'round';
