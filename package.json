@@ -6,11 +6,12 @@
   "type": "module",
   "scripts": {
     "dev": "http-server app -p 8080 -c-1",
+    "stop": "node scripts/stop.mjs",
     "test": "node --test tests/unit/",
     "test:e2e": "playwright test",
     "lint": "eslint app/js tests",
-    "format": "prettier --write \"app/**/*.{js,css,html}\" \"tests/**/*.js\" \"*.json\"",
-    "format:check": "prettier --check \"app/**/*.{js,css,html}\" \"tests/**/*.js\" \"*.json\"",
+    "format": "prettier --write \"app/**/*.{js,css,html}\" \"tests/**/*.js\" \"scripts/**/*.mjs\" \"*.json\"",
+    "format:check": "prettier --check \"app/**/*.{js,css,html}\" \"tests/**/*.js\" \"scripts/**/*.mjs\" \"*.json\"",
     "typecheck": "tsc -p tsconfig.json"
   },
   "devDependencies": {
