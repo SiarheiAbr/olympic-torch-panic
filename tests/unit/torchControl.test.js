@@ -1,7 +1,7 @@
 // @ts-check
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { KEY_ROTATION_SPEED } from '../../app/js/core/tuning.js';
+import { KEY_ROTATION_SPEED, ENVIRONMENTS } from '../../app/js/core/tuning.js';
 import { SESSION } from '../../app/js/core/state.js';
 import * as torchControl from '../../app/js/systems/torchControl.js';
 import { step } from '../../app/js/core/loop.js';
@@ -32,6 +32,27 @@ describe('torch control', () => {
     state.input.keys.d = true;
     torchControl.update(state, 0.2);
     assert.ok(Math.abs(state.torch.angle - (108 - KEY_ROTATION_SPEED * 0.2)) < 1e-9);
+  });
+
+  it('REQ-TOR-002: key rotation speed scales with the environment hazard frequency', () => {
+    // Speed ratio must equal the spawn-frequency ratio (env 1 mean interval /
+    // env N mean interval); environment 1 is exactly KEY_ROTATION_SPEED.
+    const e0 = ENVIRONMENTS[0];
+    assert.equal(e0.keyRotationSpeed, KEY_ROTATION_SPEED);
+    for (const env of ENVIRONMENTS) {
+      const expectedRatio =
+        (e0.spawnIntervalMin + e0.spawnIntervalMax) / (env.spawnIntervalMin + env.spawnIntervalMax);
+      assert.ok(Math.abs(env.keyRotationSpeed / KEY_ROTATION_SPEED - expectedRatio) < 1e-9);
+    }
+    assert.ok(ENVIRONMENTS[4].keyRotationSpeed > KEY_ROTATION_SPEED * 2);
+
+    const state = makeRunningState();
+    state.run.environmentIndex = 4;
+    state.torch.angle = 90;
+    state.input.keys.a = true;
+    torchControl.update(state, 0.1);
+    const expected = 90 + ENVIRONMENTS[4].keyRotationSpeed * 0.1;
+    assert.ok(Math.abs(state.torch.angle - expected) < 1e-9);
   });
 
   it('REQ-TOR-003: both keys held -> no rotation', () => {

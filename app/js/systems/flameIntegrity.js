@@ -2,9 +2,9 @@
 // Capability 06 — Flame Integrity
 // (specification/business/06-flame-integrity/spec.md)
 
-import { REGEN_RATE, REGEN_DELAY, HAZARD_TYPES } from '../core/tuning.js';
+import { REGEN_RATE, REGEN_DELAY, DEFLECT_LINGER, HAZARD_TYPES } from '../core/tuning.js';
 import { isBlocked } from '../core/angles.js';
-import { PROFILE, deriveFlameState } from '../core/state.js';
+import { PROFILE, HAZARD_STATE, deriveFlameState } from '../core/state.js';
 
 /**
  * Judges every hazard against the shield arc and applies drain, impact damage,
@@ -20,16 +20,28 @@ export function update(state, dt) {
     const blocked = isBlocked(state.torch.angle, hazard.approachAngle);
     hazard.blocked = blocked; // consumed by renderer/audio (REQ-HAZ-004 feedback)
 
-    if (hazard.profile === PROFILE.CONTINUOUS && hazard.activeSecondsThisFrame > 0 && !blocked) {
-      // REQ-FLM-001/002/003: drain accrues only while ACTIVE and exposed;
-      // simultaneous exposed hazards add; blocking stops drain this same frame.
-      loss += HAZARD_TYPES[hazard.type].drainRate * hazard.activeSecondsThisFrame;
+    if (
+      hazard.state === HAZARD_STATE.ACTIVE &&
+      hazard.profile === PROFILE.CONTINUOUS &&
+      hazard.activeSecondsThisFrame > 0
+    ) {
+      if (blocked) {
+        // REQ-FLM-003 / REQ-HAZ-010: a block deflects the hazard for good —
+        // no drain this frame and none ever again.
+        deflect(hazard);
+      } else {
+        // REQ-FLM-001/002: drain accrues only while ACTIVE and exposed;
+        // simultaneous exposed hazards add.
+        loss += HAZARD_TYPES[hazard.type].drainRate * hazard.activeSecondsThisFrame;
+      }
     }
 
     for (const damage of hazard.impactsThisFrame) {
-      // REQ-FLM-004: blocking is evaluated at the impact moment, all-or-nothing.
+      // REQ-FLM-004: blocking is evaluated at the impact moment, all-or-nothing;
+      // a blocked impact deflects the hazard, cancelling remaining impacts.
       if (blocked) {
         hazard.blockedImpactFx = true;
+        deflect(hazard);
       } else {
         loss += damage;
       }
@@ -56,4 +68,16 @@ export function update(state, dt) {
   // REQ-DM-004 / REQ-FLM-007: state derives from integrity every change;
   // the run-end check that follows this system ends the run at 0 (same frame).
   state.flame.state = deriveFlameState(state.flame.integrity);
+}
+
+/**
+ * REQ-HAZ-010: a blocked hazard is dismissed — it lingers only as a harmless
+ * deflection effect. Idempotent within a frame (a fireworks burst can be
+ * blocked in the same frame the stream is).
+ * @param {import('../core/state.js').Hazard} hazard
+ */
+function deflect(hazard) {
+  if (hazard.state === HAZARD_STATE.DEFLECTED) return;
+  hazard.state = HAZARD_STATE.DEFLECTED;
+  hazard.deflectRemaining = DEFLECT_LINGER;
 }

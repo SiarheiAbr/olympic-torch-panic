@@ -7,7 +7,7 @@
 //   { kind: 'dragDelta', dxFraction }     - horizontal drag as a fraction of viewport width
 // Held keys arrive as state.input.keys and are integrated over dt.
 
-import { KEY_ROTATION_SPEED } from '../core/tuning.js';
+import { ENVIRONMENTS } from '../core/tuning.js';
 import { clampAngle } from '../core/angles.js';
 
 /**
@@ -29,12 +29,15 @@ export function update(state, dt) {
   }
   state.input.queue.length = 0;
 
+  // REQ-TOR-002: key rotation runs at the current environment's speed, which
+  // scales with hazard spawn frequency so late stages stay reactable.
+  const rotationSpeed = ENVIRONMENTS[state.run.environmentIndex].keyRotationSpeed;
   const { a, d } = state.input.keys;
   if (a && !d) {
     // REQ-TOR-002: A rotates toward 180 (backward).
-    state.torch.angle = clampAngle(state.torch.angle + KEY_ROTATION_SPEED * dt);
+    state.torch.angle = clampAngle(state.torch.angle + rotationSpeed * dt);
   } else if (d && !a) {
-    state.torch.angle = clampAngle(state.torch.angle - KEY_ROTATION_SPEED * dt);
+    state.torch.angle = clampAngle(state.torch.angle - rotationSpeed * dt);
   }
   // REQ-TOR-003: both keys held -> no rotation.
 }

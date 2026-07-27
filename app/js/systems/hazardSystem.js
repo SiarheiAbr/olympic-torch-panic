@@ -59,6 +59,14 @@ function progressHazard(hazard, dt) {
   hazard.impactsThisFrame = [];
   hazard.blockedImpactFx = false;
 
+  if (hazard.state === HAZARD_STATE.DEFLECTED) {
+    // REQ-HAZ-010: deflected hazards are harmless — they only run down the
+    // deflection-effect timer and then resolve.
+    hazard.deflectRemaining -= dt;
+    if (hazard.deflectRemaining <= 0) hazard.state = HAZARD_STATE.RESOLVED;
+    return;
+  }
+
   let remainingFrameTime = dt;
   if (hazard.state === HAZARD_STATE.TELEGRAPHED) {
     if (hazard.telegraphRemaining > remainingFrameTime) {
@@ -156,6 +164,7 @@ export function attemptSpawn(state, env, rng) {
     impactsDelivered: 0,
     blocked: false,
     blockedImpactFx: false,
+    deflectRemaining: 0,
   };
   state.hazards.push(hazard);
   return hazard;

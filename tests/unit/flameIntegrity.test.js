@@ -54,6 +54,34 @@ describe('flame integrity', () => {
     assert.equal(state.hazards[0].blocked, true);
   });
 
+  it('REQ-FLM-003/REQ-HAZ-010: blocking a continuous hazard deflects it for good', () => {
+    const state = makeRunningState();
+    state.torch.angle = 180;
+    state.hazards = [hazardFrame({ type: 'WIND_GUST', approachAngle: 180, activeSeconds: 1 })];
+    flameIntegrity.update(state, 1 / 60);
+    assert.equal(state.flame.integrity, 100);
+    assert.equal(state.hazards[0].state, HAZARD_STATE.DEFLECTED);
+    assert.ok(state.hazards[0].deflectRemaining > 0);
+
+    // Rotating away afterwards can never re-expose a deflected hazard: even a
+    // stale exposure value is ignored because the state is no longer ACTIVE.
+    state.torch.angle = 0;
+    state.hazards[0].activeSecondsThisFrame = 1;
+    flameIntegrity.update(state, 1 / 60);
+    assert.equal(state.flame.integrity, 100);
+    assert.equal(state.hazards[0].state, HAZARD_STATE.DEFLECTED);
+  });
+
+  it('REQ-FLM-004/REQ-HAZ-010: a blocked impact deflects the hazard, cancelling later bursts', () => {
+    const state = makeRunningState();
+    state.torch.angle = 45;
+    state.hazards = [hazardFrame({ type: 'FIREWORKS_BURST', approachAngle: 45, impacts: [10] })];
+    flameIntegrity.update(state, 1 / 60);
+    assert.equal(state.flame.integrity, 100);
+    assert.equal(state.hazards[0].blockedImpactFx, true);
+    assert.equal(state.hazards[0].state, HAZARD_STATE.DEFLECTED);
+  });
+
   it('REQ-DM-005: the inclusive 60-degree boundary blocks; 61 degrees does not', () => {
     const state = makeRunningState();
     state.torch.angle = 30; // rain at 90: |30-90| = 60 -> blocked
@@ -61,6 +89,8 @@ describe('flame integrity', () => {
     flameIntegrity.update(state, 1 / 60);
     assert.equal(state.flame.integrity, 100);
     state.torch.angle = 29;
+    // fresh hazard — the first one was deflected by the successful block
+    state.hazards = [hazardFrame({ type: 'RAIN_SHOWER', approachAngle: 90, activeSeconds: 1 })];
     flameIntegrity.update(state, 1 / 60);
     assert.ok(state.flame.integrity < 100);
   });

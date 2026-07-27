@@ -8,7 +8,8 @@ export const TOTAL_DISTANCE = 5000; // meters to LA (victory)
 export const BASE_SPEED = 25; // m/s in environment 1
 export const SPEED_INCREMENT = 5; // m/s added per environment stage
 export const SHIELD_HALF_ARC = 60; // degrees; blocking comparison is inclusive
-export const KEY_ROTATION_SPEED = 180; // degrees/s while A or D held
+export const KEY_ROTATION_SPEED = 180; // degrees/s while A or D held, in environment 1
+export const DEFLECT_LINGER = 0.3; // s a deflected hazard's harmless effect stays visible
 export const REGEN_RATE = 8; // integrity/s during calm
 export const REGEN_DELAY = 1.0; // s of calm before recovery starts
 export const START_GRACE = 3.0; // hazard-free s at run start
@@ -140,11 +141,18 @@ export const ENVIRONMENTS = Object.freeze(
         FIREWORKS_BURST: 30,
       },
     },
-  ].map((env, i) =>
+  ].map((env, i, all) =>
     Object.freeze({
       ...env,
       index: i,
       speed: BASE_SPEED + i * SPEED_INCREMENT,
+      // REQ-TOR-002: key rotation scales with hazard frequency — the ratio of
+      // environment 1's mean spawn interval to this environment's, so denser
+      // stages stay reactable (180°/s in stage 1 up to ~415°/s in Downtown LA).
+      keyRotationSpeed:
+        KEY_ROTATION_SPEED *
+        ((all[0].spawnIntervalMin + all[0].spawnIntervalMax) /
+          (env.spawnIntervalMin + env.spawnIntervalMax)),
       weights: Object.freeze(env.weights),
     })
   )
