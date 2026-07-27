@@ -94,6 +94,7 @@ export const ENVIRONMENTS = Object.freeze(
       maxConcurrentHazards: 1,
       spawnIntervalMin: 2.5,
       spawnIntervalMax: 3.5,
+      volleyChance: 0,
       weights: {
         WIND_GUST: 50,
         RAIN_SHOWER: 30,
@@ -107,6 +108,7 @@ export const ENVIRONMENTS = Object.freeze(
       maxConcurrentHazards: 2,
       spawnIntervalMin: 2.0,
       spawnIntervalMax: 3.0,
+      volleyChance: 0,
       weights: {
         WIND_GUST: 30,
         RAIN_SHOWER: 40,
@@ -120,6 +122,8 @@ export const ENVIRONMENTS = Object.freeze(
       maxConcurrentHazards: 2,
       spawnIntervalMin: 1.6,
       spawnIntervalMax: 2.4,
+      // REQ-HAZ-011: chance a spawn attempt is an unblockable two-hazard volley.
+      volleyChance: 0.15,
       weights: {
         WIND_GUST: 35,
         RAIN_SHOWER: 0,
@@ -133,6 +137,7 @@ export const ENVIRONMENTS = Object.freeze(
       maxConcurrentHazards: 3,
       spawnIntervalMin: 1.3,
       spawnIntervalMax: 2.0,
+      volleyChance: 0.25,
       weights: {
         WIND_GUST: 20,
         RAIN_SHOWER: 15,
@@ -146,6 +151,7 @@ export const ENVIRONMENTS = Object.freeze(
       maxConcurrentHazards: 3,
       spawnIntervalMin: 1.0,
       spawnIntervalMax: 1.6,
+      volleyChance: 0.35,
       weights: {
         WIND_GUST: 20,
         RAIN_SHOWER: 10,

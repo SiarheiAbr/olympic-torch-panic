@@ -233,6 +233,70 @@ describe('hazard system', () => {
     assert.ok(Math.abs(t - DEFLECT_LINGER) < 0.05, `lingered ${t.toFixed(2)}s`);
   });
 
+  it('REQ-HAZ-011: a volley spawns two hazards no single angle can block', () => {
+    const rng = createRng(9);
+    for (let i = 0; i < 100; i++) {
+      const state = makeRunningState();
+      quietSpawner(state);
+      const pair = hazardSystem.attemptVolley(state, ENVIRONMENTS[4], rng);
+      assert.notEqual(pair, null);
+      const [a, b] = pair;
+      assert.ok(
+        Math.abs(a.approachAngle - b.approachAngle) > 120,
+        `${a.approachAngle}/${b.approachAngle}`
+      );
+      assert.equal(state.hazards.length, 2);
+      assert.ok(HAZARD_TYPES[a.type].angles.includes(a.approachAngle));
+      assert.ok(HAZARD_TYPES[b.type].angles.includes(b.approachAngle));
+    }
+  });
+
+  it('REQ-HAZ-011: a volley needs two free slots and falls back otherwise', () => {
+    const state = makeRunningState();
+    quietSpawner(state);
+    const rng = createRng(10);
+    // occupy 2 of Downtown LA's 3 slots -> volley impossible
+    hazardSystem.attemptVolley(state, ENVIRONMENTS[4], rng);
+    assert.equal(state.hazards.length, 2);
+    assert.equal(hazardSystem.attemptVolley(state, ENVIRONMENTS[4], rng), null);
+    assert.equal(state.hazards.length, 2);
+  });
+
+  it('REQ-HAZ-011: volleys occur in late stages at roughly VOLLEY_CHANCE rate', () => {
+    const state = makeRunningState();
+    state.run.distance = 4500; // Downtown LA
+    state.run.environmentIndex = 4;
+    state.spawner.graceRemaining = 0;
+    state.spawner.nextSpawnIn = 0.01;
+    const ctx = makeCtx(21);
+    const dt = 1 / 60;
+    let volleys = 0;
+    let spawnEvents = 0;
+    let prevSeq = state.hazardSeq;
+    for (let t = 0; t < 120; t += dt) {
+      hazardSystem.update(state, dt, ctx);
+      const born = state.hazardSeq - prevSeq;
+      prevSeq = state.hazardSeq;
+      if (born === 1) spawnEvents++;
+      if (born === 2) {
+        spawnEvents++;
+        volleys++;
+        const twins = state.hazards.slice(-2);
+        assert.ok(Math.abs(twins[0].approachAngle - twins[1].approachAngle) > 120);
+      }
+      // keep slots open so volleys stay possible: resolve everything each frame
+      for (const h of state.hazards) h.state = HAZARD_STATE.RESOLVED;
+    }
+    assert.ok(volleys >= 10, `expected recurring volleys, got ${volleys}`);
+    const rate = volleys / spawnEvents;
+    assert.ok(
+      rate > 0.2 && rate < 0.5,
+      `volley rate ${rate.toFixed(2)} should be near VOLLEY_CHANCE 0.35`
+    );
+    assert.equal(ENVIRONMENTS[0].volleyChance, 0); // early stages never volley
+    assert.equal(ENVIRONMENTS[1].volleyChance, 0);
+  });
+
   it('every spawned angle is allowed for its type', () => {
     const rng = createRng(6);
     for (let i = 0; i < 300; i++) {
