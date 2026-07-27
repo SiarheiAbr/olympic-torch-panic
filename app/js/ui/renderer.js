@@ -26,11 +26,23 @@ const HAZARD_GLYPHS = {
 
 const TORCH_RADIUS = 62; // px from runner pivot to flame tip
 const SHIELD_RADIUS = 82;
-const TELEGRAPH_RADIUS = 170;
 // Hazard visuals only — hitboxes are angle-based in hazardSystem, so these
 // sizes carry no gameplay weight. Sized for a full-window canvas.
-const HAZARD_GLYPH_FONT = '44px serif';
-const TELEGRAPH_RING_RADIUS = 38;
+const HAZARD_GLYPH_FONT = '72px serif';
+const TELEGRAPH_RING_RADIUS = 60;
+// Telegraphs sit as far from the shield as the viewport allows (threats read
+// as coming from a distance), clamped so they stay fully on-screen: the lower
+// bound keeps small/mobile layouts working, the margin covers the pulsing
+// ring, and the upper bound stops ultra-wide screens pushing them to the edge.
+const TELEGRAPH_RADIUS_MIN = 170;
+const TELEGRAPH_RADIUS_MAX = 340;
+const TELEGRAPH_EDGE_MARGIN = 80;
+
+/** Distance from the runner at which telegraphs appear, for a cx/cy pivot. */
+function telegraphRadiusFor(cx, cy) {
+  const fit = Math.min(cx, cy) - TELEGRAPH_EDGE_MARGIN;
+  return Math.max(TELEGRAPH_RADIUS_MIN, Math.min(TELEGRAPH_RADIUS_MAX, fit));
+}
 
 /** Screen-space direction for a business angle (0=right, 90=up, 180=left). */
 function dir(angleDeg) {
@@ -72,7 +84,8 @@ export function createRenderer(canvas) {
       drawRunner(cx, cy, groundY, state);
       drawShieldArc(cx, cy, state.torch.angle);
       drawTorch(cx, cy, state);
-      for (const hazard of state.hazards) drawHazard(cx, cy, hazard);
+      const telegraphR = telegraphRadiusFor(cx, cy);
+      for (const hazard of state.hazards) drawHazard(cx, cy, telegraphR, hazard);
       if (state.flame.state === FLAME_STATE.CRITICAL) drawCriticalVignette(w, h);
     }
   }
@@ -181,18 +194,21 @@ export function createRenderer(canvas) {
     ctx2d.fill();
   }
 
-  /** @param {import('../core/state.js').Hazard} hazard */
-  function drawHazard(cx, cy, hazard) {
+  /**
+   * @param {number} telegraphR distance from the runner at which hazards appear
+   * @param {import('../core/state.js').Hazard} hazard
+   */
+  function drawHazard(cx, cy, telegraphR, hazard) {
     const d = dir(hazard.approachAngle);
     if (hazard.state === HAZARD_STATE.TELEGRAPHED) {
       // REQ-HAZ-001: direction indicator + type glyph + time-left ring.
-      const px = cx + d.x * TELEGRAPH_RADIUS;
-      const py = cy + d.y * TELEGRAPH_RADIUS;
+      const px = cx + d.x * telegraphR;
+      const py = cy + d.y * telegraphR;
       const progress = 1 - hazard.telegraphRemaining / hazard.telegraphTotal;
       const pulse = 1 + 0.12 * Math.sin(time * 10);
 
       ctx2d.strokeStyle = 'rgba(255,60,60,0.9)';
-      ctx2d.lineWidth = 4;
+      ctx2d.lineWidth = 5;
       ctx2d.beginPath();
       ctx2d.arc(
         px,
@@ -209,13 +225,13 @@ export function createRenderer(canvas) {
       ctx2d.fillText(HAZARD_GLYPHS[hazard.type] || '⚠️', px, py);
 
       // arrow toward the runner (pulled inward to clear the larger ring)
-      const ax = cx + d.x * (TELEGRAPH_RADIUS - 56);
-      const ay = cy + d.y * (TELEGRAPH_RADIUS - 56);
+      const ax = cx + d.x * (telegraphR - 92);
+      const ay = cy + d.y * (telegraphR - 92);
       ctx2d.fillStyle = 'rgba(255,60,60,0.9)';
       ctx2d.beginPath();
       ctx2d.moveTo(ax, ay);
-      ctx2d.lineTo(ax + d.x * -19 - d.y * 11, ay + d.y * -19 + d.x * 11);
-      ctx2d.lineTo(ax + d.x * -19 + d.y * 11, ay + d.y * -19 - d.x * 11);
+      ctx2d.lineTo(ax + d.x * -26 - d.y * 15, ay + d.y * -26 + d.x * 15);
+      ctx2d.lineTo(ax + d.x * -26 + d.y * 15, ay + d.y * -26 - d.x * 15);
       ctx2d.closePath();
       ctx2d.fill();
       return;
@@ -228,16 +244,13 @@ export function createRenderer(canvas) {
     const stopRadius = hazard.blocked ? SHIELD_RADIUS : 22;
     if (hazard.profile === PROFILE.CONTINUOUS) {
       ctx2d.strokeStyle = hazard.blocked ? 'rgba(180,220,255,0.8)' : 'rgba(255,70,40,0.85)';
-      ctx2d.lineWidth = 4;
+      ctx2d.lineWidth = 5;
       for (let i = -1; i <= 1; i++) {
-        const jitter = Math.sin(time * 22 + i * 2.1) * 8;
-        const ox = -d.y * (i * 16 + jitter * 0.3);
-        const oy = d.x * (i * 16 + jitter * 0.3);
+        const jitter = Math.sin(time * 22 + i * 2.1) * 10;
+        const ox = -d.y * (i * 22 + jitter * 0.3);
+        const oy = d.x * (i * 22 + jitter * 0.3);
         ctx2d.beginPath();
-        ctx2d.moveTo(
-          cx + d.x * (TELEGRAPH_RADIUS - 10) + ox,
-          cy + d.y * (TELEGRAPH_RADIUS - 10) + oy
-        );
+        ctx2d.moveTo(cx + d.x * (telegraphR - 10) + ox, cy + d.y * (telegraphR - 10) + oy);
         ctx2d.lineTo(cx + d.x * stopRadius + ox, cy + d.y * stopRadius + oy);
         ctx2d.stroke();
       }
@@ -246,8 +259,8 @@ export function createRenderer(canvas) {
       ctx2d.textBaseline = 'middle';
       ctx2d.fillText(
         HAZARD_GLYPHS[hazard.type],
-        cx + d.x * (TELEGRAPH_RADIUS - 4),
-        cy + d.y * (TELEGRAPH_RADIUS - 4)
+        cx + d.x * (telegraphR - 4),
+        cy + d.y * (telegraphR - 4)
       );
     } else {
       // Impact hazards: a burst at the point where they landed this frame.
@@ -256,12 +269,12 @@ export function createRenderer(canvas) {
       ctx2d.font = HAZARD_GLYPH_FONT;
       ctx2d.textAlign = 'center';
       ctx2d.textBaseline = 'middle';
-      ctx2d.fillText(HAZARD_GLYPHS[hazard.type], px + d.x * 24, py + d.y * 24);
+      ctx2d.fillText(HAZARD_GLYPHS[hazard.type], px + d.x * 34, py + d.y * 34);
       ctx2d.fillStyle = hazard.blocked ? 'rgba(180,220,255,0.9)' : 'rgba(255,90,30,0.9)';
       for (let i = 0; i < 6; i++) {
         const a = (i / 6) * Math.PI * 2 + time * 4;
         ctx2d.beginPath();
-        ctx2d.arc(px + Math.cos(a) * 17, py + Math.sin(a) * 17, 4, 0, Math.PI * 2);
+        ctx2d.arc(px + Math.cos(a) * 26, py + Math.sin(a) * 26, 6, 0, Math.PI * 2);
         ctx2d.fill();
       }
     }
@@ -271,9 +284,9 @@ export function createRenderer(canvas) {
       const bx = cx + d.x * SHIELD_RADIUS;
       const by = cy + d.y * SHIELD_RADIUS;
       ctx2d.strokeStyle = 'rgba(255,255,255,0.95)';
-      ctx2d.lineWidth = 4;
+      ctx2d.lineWidth = 5;
       ctx2d.beginPath();
-      ctx2d.arc(bx, by, 22, 0, Math.PI * 2);
+      ctx2d.arc(bx, by, 30, 0, Math.PI * 2);
       ctx2d.stroke();
     }
   }
