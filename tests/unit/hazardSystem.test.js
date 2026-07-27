@@ -1,7 +1,12 @@
 // @ts-check
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { HAZARD_TYPES, ENVIRONMENTS, START_GRACE } from '../../app/js/core/tuning.js';
+import {
+  HAZARD_TYPES,
+  ENVIRONMENTS,
+  START_GRACE,
+  DEFLECT_LINGER,
+} from '../../app/js/core/tuning.js';
 import { HAZARD_STATE } from '../../app/js/core/state.js';
 import * as hazardSystem from '../../app/js/systems/hazardSystem.js';
 import { createRng } from '../../app/js/core/rng.js';
@@ -190,6 +195,42 @@ describe('hazard system', () => {
     }
     assert.equal(impacts, 1);
     assert.ok(Math.abs(t - HAZARD_TYPES.BEACH_BALL.telegraph) < 0.05);
+  });
+
+  it('REQ-HAZ-010: a deflected hazard is harmless and resolves after DEFLECT_LINGER', () => {
+    const state = makeRunningState();
+    quietSpawner(state);
+    const ctx = makeCtx();
+    const dt = 1 / 60;
+    /** @type {any} */
+    const wind = {
+      id: 1,
+      type: 'WIND_GUST',
+      approachAngle: 180,
+      profile: 'CONTINUOUS',
+      state: HAZARD_STATE.DEFLECTED,
+      telegraphRemaining: 0,
+      telegraphTotal: 1,
+      activeElapsed: 0.1,
+      activeSecondsThisFrame: 0,
+      impactsThisFrame: [],
+      impactsDelivered: 0,
+      blocked: true,
+      blockedImpactFx: false,
+      deflectRemaining: DEFLECT_LINGER,
+    };
+    state.hazards.push(wind);
+
+    let t = 0;
+    while (state.hazards.includes(wind) && wind.state === HAZARD_STATE.DEFLECTED && t < 2) {
+      hazardSystem.update(state, dt, ctx);
+      t += dt;
+      // never dangerous again: no exposure time, no impacts
+      assert.equal(wind.activeSecondsThisFrame, 0);
+      assert.equal(wind.impactsThisFrame.length, 0);
+    }
+    assert.equal(wind.state, HAZARD_STATE.RESOLVED);
+    assert.ok(Math.abs(t - DEFLECT_LINGER) < 0.05, `lingered ${t.toFixed(2)}s`);
   });
 
   it('every spawned angle is allowed for its type', () => {

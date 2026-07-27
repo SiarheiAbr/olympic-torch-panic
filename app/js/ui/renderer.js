@@ -5,7 +5,7 @@
 // REQ-HAZ-001 (telegraph shows direction + type), REQ-HAZ-004 (blocked vs
 // exposed visuals differ), REQ-FLM-008 (flame states differ, critical pulse).
 
-import { SHIELD_HALF_ARC } from '../core/tuning.js';
+import { SHIELD_HALF_ARC, DEFLECT_LINGER } from '../core/tuning.js';
 import { SESSION, HAZARD_STATE, PROFILE, FLAME_STATE } from '../core/state.js';
 
 const ENV_THEMES = [
@@ -234,6 +234,32 @@ export function createRenderer(canvas) {
       ctx2d.lineTo(ax + d.x * -26 + d.y * 15, ay + d.y * -26 - d.x * 15);
       ctx2d.closePath();
       ctx2d.fill();
+      return;
+    }
+
+    if (hazard.state === HAZARD_STATE.DEFLECTED) {
+      // REQ-HAZ-010 / REQ-HAZ-004: a successful block knocks the hazard away —
+      // a brief fading burst at the shield edge, then it is gone.
+      const t = Math.max(0, hazard.deflectRemaining) / DEFLECT_LINGER; // 1 -> 0
+      const px = cx + d.x * (SHIELD_RADIUS + (1 - t) * 46);
+      const py = cy + d.y * (SHIELD_RADIUS + (1 - t) * 46);
+      ctx2d.globalAlpha = t;
+      ctx2d.font = HAZARD_GLYPH_FONT;
+      ctx2d.textAlign = 'center';
+      ctx2d.textBaseline = 'middle';
+      ctx2d.fillText(HAZARD_GLYPHS[hazard.type], px, py);
+      ctx2d.strokeStyle = 'rgba(180,220,255,0.95)';
+      ctx2d.lineWidth = 5;
+      ctx2d.beginPath();
+      ctx2d.arc(
+        cx + d.x * SHIELD_RADIUS,
+        cy + d.y * SHIELD_RADIUS,
+        30 + (1 - t) * 26,
+        0,
+        Math.PI * 2
+      );
+      ctx2d.stroke();
+      ctx2d.globalAlpha = 1;
       return;
     }
 

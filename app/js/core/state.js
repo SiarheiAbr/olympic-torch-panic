@@ -26,6 +26,7 @@ export const FLAME_STATE = Object.freeze({
 export const HAZARD_STATE = Object.freeze({
   TELEGRAPHED: 'TELEGRAPHED',
   ACTIVE: 'ACTIVE',
+  DEFLECTED: 'DEFLECTED', // blocked; harmless, lingers DEFLECT_LINGER s as pure visuals
   RESOLVED: 'RESOLVED',
 });
 
@@ -57,6 +58,7 @@ export const PROFILE = Object.freeze({
  * @property {number} impactsDelivered
  * @property {boolean} blocked - last blocking evaluation (for rendering/audio)
  * @property {boolean} blockedImpactFx - an impact bounced off this frame
+ * @property {number} deflectRemaining - s of deflection effect left (DEFLECTED only)
  */
 
 /**
