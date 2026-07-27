@@ -9,6 +9,7 @@ import {
   RESUME_COUNTDOWN,
   TORCH_START_ANGLE,
   BANNER_DURATION,
+  SPEED_JITTER,
 } from '../core/tuning.js';
 import { SESSION, OUTCOME, FLAME_STATE, deriveFlameState } from '../core/state.js';
 
@@ -35,7 +36,9 @@ export function currentEnvironment(state) {
  */
 export function startRun(state) {
   state.session = SESSION.RUNNING;
-  state.run = { distance: 0, elapsedTime: 0, environmentIndex: 0, outcome: null };
+  // speedFactor 0 = not yet drawn; the first update() draws it (REQ-RUN-011).
+  // Drawn lazily so startRun stays callable without a random source.
+  state.run = { distance: 0, elapsedTime: 0, environmentIndex: 0, speedFactor: 0, outcome: null };
   state.torch.angle = TORCH_START_ANGLE;
   state.flame = { integrity: 100, state: FLAME_STATE.STRONG };
   state.hazards = [];
@@ -50,24 +53,34 @@ export function startRun(state) {
 /**
  * REQ-RUN-002/003/004/005: distance and time accrue only while RUNNING;
  * environment derives from distance and its change shows a banner cue.
+ * REQ-RUN-011: each stage runs at a per-run random speed factor so survival
+ * times differ between runs of equal skill.
  * @param {import('../core/state.js').GameState} state
  * @param {number} dt
+ * @param {{rng: import('../core/rng.js').Rng}} ctx
  */
-export function update(state, dt) {
+export function update(state, dt, ctx) {
   const run = state.run;
+  if (run.speedFactor === 0) run.speedFactor = drawSpeedFactor(ctx.rng);
   const env = ENVIRONMENTS[environmentIndexForDistance(run.distance)];
-  run.distance = Math.min(TOTAL_DISTANCE, run.distance + env.speed * dt);
+  run.distance = Math.min(TOTAL_DISTANCE, run.distance + env.speed * run.speedFactor * dt);
   run.elapsedTime += dt;
 
   const newIndex = environmentIndexForDistance(run.distance);
   if (newIndex !== run.environmentIndex) {
     run.environmentIndex = newIndex;
+    run.speedFactor = drawSpeedFactor(ctx.rng);
     state.banner = { name: ENVIRONMENTS[newIndex].name, remaining: BANNER_DURATION };
   }
   if (state.banner) {
     state.banner.remaining -= dt;
     if (state.banner.remaining <= 0) state.banner = null;
   }
+}
+
+/** @param {import('../core/rng.js').Rng} rng */
+function drawSpeedFactor(rng) {
+  return rng.range(1 - SPEED_JITTER, 1 + SPEED_JITTER);
 }
 
 /**

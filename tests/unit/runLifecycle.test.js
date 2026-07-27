@@ -6,6 +6,7 @@ import {
   ENVIRONMENTS,
   START_GRACE,
   RESUME_COUNTDOWN,
+  SPEED_JITTER,
 } from '../../app/js/core/tuning.js';
 import { SESSION, OUTCOME, HAZARD_STATE, createInitialState } from '../../app/js/core/state.js';
 import * as runLifecycle from '../../app/js/systems/runLifecycle.js';
@@ -27,12 +28,42 @@ describe('run lifecycle', () => {
     assert.equal(state.spawner.graceRemaining, START_GRACE);
   });
 
-  it('REQ-RUN-002/003: distance and time accrue at environment speed while RUNNING', () => {
+  it('REQ-RUN-002/003: distance and time accrue at jittered environment speed while RUNNING', () => {
     const state = makeRunningState();
     const ctx = makeCtx();
     simulate(state, 2, ctx);
-    assert.ok(Math.abs(state.run.distance - ENVIRONMENTS[0].speed * 2) < 0.01);
+    const factor = state.run.speedFactor;
+    assert.ok(factor >= 1 - SPEED_JITTER && factor <= 1 + SPEED_JITTER, `factor ${factor}`);
+    assert.ok(Math.abs(state.run.distance - ENVIRONMENTS[0].speed * factor * 2) < 0.01);
     assert.ok(Math.abs(state.run.elapsedTime - 2) < 0.01);
+  });
+
+  it('REQ-RUN-011: victory survival times differ between runs (per-stage speed jitter)', () => {
+    const times = new Set();
+    for (const seed of [1, 2, 3]) {
+      const state = makeRunningState();
+      const ctx = makeCtx(seed);
+      // suppress hazards so each run is a clean, full-length victory
+      state.spawner.graceRemaining = 0;
+      state.spawner.nextSpawnIn = 1e9;
+      let guard = 0;
+      while (state.session === SESSION.RUNNING && guard++ < 15_000) {
+        step(state, 1 / 6, ctx); // coarse steps keep the test fast
+      }
+      assert.equal(state.run.outcome, OUTCOME.REACHED_LA, `seed ${seed} must win`);
+      // total time stays inside the jitter envelope around the ~149 s baseline
+      const baseline = ENVIRONMENTS.reduce(
+        (s, env) => s + TOTAL_DISTANCE / ENVIRONMENTS.length / env.speed,
+        0
+      );
+      assert.ok(
+        state.run.elapsedTime > baseline / (1 + SPEED_JITTER) - 1 &&
+          state.run.elapsedTime < baseline / (1 - SPEED_JITTER) + 1,
+        `seed ${seed}: ${state.run.elapsedTime.toFixed(1)}s outside envelope`
+      );
+      times.add(state.run.elapsedTime.toFixed(1));
+    }
+    assert.ok(times.size >= 2, `times should differ across seeds, got ${[...times]}`);
   });
 
   it('REQ-RUN-004/005: environment changes at the boundary and shows a banner', () => {

@@ -23,7 +23,7 @@ import * as flameIntegrity from '../systems/flameIntegrity.js';
 export function step(state, dt, ctx) {
   if (state.session === SESSION.RUNNING) {
     torchControl.update(state, dt);
-    runLifecycle.update(state, dt);
+    runLifecycle.update(state, dt, ctx);
     hazardSystem.update(state, dt, ctx);
     flameIntegrity.update(state, dt);
     runLifecycle.checkRunEnd(state);

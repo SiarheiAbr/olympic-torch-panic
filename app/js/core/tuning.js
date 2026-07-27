@@ -7,6 +7,10 @@ export const TOTAL_DISTANCE = 5000; // meters to LA (victory)
 // per stage ≈ 149 s), so a "one more try" loop stays short and punchy.
 export const BASE_SPEED = 25; // m/s in environment 1
 export const SPEED_INCREMENT = 5; // m/s added per environment stage
+// REQ-RUN-011: each stage's speed is scaled by a factor drawn from
+// [1-SPEED_JITTER, 1+SPEED_JITTER] per run, so winning survival times vary
+// instead of always summing to the same deterministic total (~149 s).
+export const SPEED_JITTER = 0.07;
 export const SHIELD_HALF_ARC = 60; // degrees; blocking comparison is inclusive
 export const KEY_ROTATION_SPEED = 180; // degrees/s while A or D held, in environment 1
 export const DEFLECT_LINGER = 0.3; // s a deflected hazard's harmless effect stays visible
