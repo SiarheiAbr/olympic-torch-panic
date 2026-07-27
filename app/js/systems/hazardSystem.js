@@ -2,7 +2,7 @@
 // Capability 05 — Hazard System
 // (specification/business/05-hazard-system/spec.md)
 
-import { HAZARD_TYPES, ENVIRONMENTS } from '../core/tuning.js';
+import { HAZARD_TYPES, ENVIRONMENTS, SHIELD_HALF_ARC } from '../core/tuning.js';
 import { HAZARD_STATE, PROFILE } from '../core/state.js';
 
 /**
@@ -35,7 +35,12 @@ export function update(state, dt, ctx) {
   } else {
     spawner.nextSpawnIn -= dt;
     while (spawner.nextSpawnIn <= 0) {
-      attemptSpawn(state, env, ctx.rng);
+      // REQ-HAZ-011: late stages roll for a two-hazard volley first; an
+      // impossible volley (slots/angles) falls back to a single spawn.
+      const volleyRolled = env.volleyChance > 0 && ctx.rng.next() < env.volleyChance;
+      if (!volleyRolled || attemptVolley(state, env, ctx.rng) === null) {
+        attemptSpawn(state, env, ctx.rng);
+      }
       // REQ-HAZ-007: a fresh delay is drawn after every attempt, spawned or skipped.
       spawner.nextSpawnIn += drawInterval(env, ctx.rng);
     }
@@ -148,7 +153,70 @@ export function attemptSpawn(state, env, rng) {
   const freeAngles = def.angles.filter((a) => !occupied.has(a));
   // REQ-HAZ-008 holds by construction: only unoccupied angles are eligible.
   const approachAngle = freeAngles[rng.int(0, freeAngles.length - 1)];
+  return createHazard(state, type, approachAngle);
+}
 
+/**
+ * REQ-HAZ-011: a volley — two hazards spawned in one attempt at an angle pair
+ * no single torch angle can block (separation > 2 x SHIELD_HALF_ARC). Returns
+ * the pair, or null when a volley is impossible (needs two free concurrency
+ * slots and an eligible free angle pair) so the caller falls back to a single.
+ * @param {import('../core/state.js').GameState} state
+ * @param {(typeof ENVIRONMENTS)[number]} env
+ * @param {import('../core/rng.js').Rng} rng
+ * @returns {?[import('../core/state.js').Hazard, import('../core/state.js').Hazard]}
+ */
+export function attemptVolley(state, env, rng) {
+  const live = state.hazards.filter((h) => h.state !== HAZARD_STATE.RESOLVED);
+  if (live.length + 2 > env.maxConcurrentHazards) return null;
+
+  const occupied = new Set(live.map((h) => h.approachAngle));
+  /** @type {Array<[string, number]>} */
+  const weightedTypes = Object.entries(env.weights).filter(([, w]) => w > 0);
+  const freeAngles = [...new Set(weightedTypes.flatMap(([t]) => HAZARD_TYPES[t].angles))].filter(
+    (a) => !occupied.has(a)
+  );
+
+  /** @type {Array<[number, number]>} */
+  const pairs = [];
+  for (let i = 0; i < freeAngles.length; i++) {
+    for (let j = i + 1; j < freeAngles.length; j++) {
+      if (Math.abs(freeAngles[i] - freeAngles[j]) > 2 * SHIELD_HALF_ARC) {
+        pairs.push([freeAngles[i], freeAngles[j]]);
+      }
+    }
+  }
+  if (pairs.length === 0) return null;
+
+  const [angleA, angleB] = pairs[rng.int(0, pairs.length - 1)];
+  return [
+    createHazard(state, pickTypeForAngle(env, angleA, rng), angleA),
+    createHazard(state, pickTypeForAngle(env, angleB, rng), angleB),
+  ];
+}
+
+/**
+ * Weighted type pick restricted to types that allow the given angle
+ * (REQ-HAZ-006 applied per volley slot).
+ * @param {(typeof ENVIRONMENTS)[number]} env
+ * @param {number} angle
+ * @param {import('../core/rng.js').Rng} rng
+ */
+function pickTypeForAngle(env, angle, rng) {
+  /** @type {Array<[string, number]>} */
+  const candidates = Object.entries(env.weights).filter(
+    ([t, w]) => w > 0 && HAZARD_TYPES[t].angles.includes(angle)
+  );
+  return rng.weighted(candidates);
+}
+
+/**
+ * @param {import('../core/state.js').GameState} state
+ * @param {string} type
+ * @param {number} approachAngle
+ */
+function createHazard(state, type, approachAngle) {
+  const def = HAZARD_TYPES[type];
   /** @type {import('../core/state.js').Hazard} */
   const hazard = {
     id: state.hazardSeq++,
