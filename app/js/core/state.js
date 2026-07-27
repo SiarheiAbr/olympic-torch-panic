@@ -40,6 +40,7 @@ export const PROFILE = Object.freeze({
  * @property {number} distance - meters, monotonically increasing while RUNNING
  * @property {number} elapsedTime - seconds in RUNNING state only (survival time)
  * @property {number} environmentIndex - 0-based stage index, derived from distance
+ * @property {number} speedFactor - per-stage jitter multiplier (REQ-RUN-011); 0 = not yet drawn
  * @property {?string} outcome - null | OUTCOME.*, set exactly once
  */
 
