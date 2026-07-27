@@ -67,12 +67,21 @@ export const HAZARD_TYPES = Object.freeze({
   }),
 });
 
+// Global hazard-frequency knob: every environment's spawn-interval range is
+// multiplied by this. Scaling uniformly keeps the stage-to-stage interval
+// RATIOS intact, so the difficulty-scaled key rotation speeds (REQ-TOR-002,
+// derived from those ratios) are unchanged by design. 0.85 ≈ 18% more spawn
+// attempts per second — compensates for deflect-on-block (Rework #1) making
+// blocks terminal, which had left full runs too easy.
+export const SPAWN_INTERVAL_SCALE = 0.85;
+
 /**
  * Environment table (specification/business/03-run-lifecycle/spec.md).
  * Stages split TOTAL_DISTANCE into equal fifths; boundaries scale with it.
  * `weights` are the hazard-mix spawn weights (each row sums to 100).
  * Spawn intervals are tightened versus the original spec numbers so hazard
- * density per second stays challenging at the faster run pace above.
+ * density per second stays challenging at the faster run pace above; the
+ * ranges below are further scaled by SPAWN_INTERVAL_SCALE.
  */
 export const ENVIRONMENTS = Object.freeze(
   [
@@ -146,9 +155,13 @@ export const ENVIRONMENTS = Object.freeze(
       ...env,
       index: i,
       speed: BASE_SPEED + i * SPEED_INCREMENT,
+      spawnIntervalMin: env.spawnIntervalMin * SPAWN_INTERVAL_SCALE,
+      spawnIntervalMax: env.spawnIntervalMax * SPAWN_INTERVAL_SCALE,
       // REQ-TOR-002: key rotation scales with hazard frequency — the ratio of
       // environment 1's mean spawn interval to this environment's, so denser
       // stages stay reactable (180°/s in stage 1 up to ~415°/s in Downtown LA).
+      // The ratio uses the raw table rows, but SPAWN_INTERVAL_SCALE would
+      // cancel out of it anyway — the frequency knob never moves these speeds.
       keyRotationSpeed:
         KEY_ROTATION_SPEED *
         ((all[0].spawnIntervalMin + all[0].spawnIntervalMax) /
