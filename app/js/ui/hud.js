@@ -15,11 +15,9 @@ const GAUGE_CLASS_BY_FLAME_STATE = {
   [FLAME_STATE.EXTINGUISHED]: 'gauge-critical',
 };
 
-// Logical drawing size of the indicator; on screen it is upscaled by
-// FLAME_SCALE (CSS .hud-flame must equal logical size x scale).
-const FLAME_W = 46;
-const FLAME_H = 64;
-const FLAME_SCALE = 1.25;
+// Logical drawing size of the flame icon (CSS px; must match .hud-flame).
+const FLAME_W = 38;
+const FLAME_H = 46;
 
 /**
  * @param {Object} els
@@ -32,11 +30,11 @@ const FLAME_SCALE = 1.25;
  * @param {HTMLElement} els.banner
  */
 export function createHud(els) {
-  const px = (window.devicePixelRatio || 1) * FLAME_SCALE;
-  els.flame.width = Math.round(FLAME_W * px);
-  els.flame.height = Math.round(FLAME_H * px);
+  const dpr = window.devicePixelRatio || 1;
+  els.flame.width = Math.round(FLAME_W * dpr);
+  els.flame.height = Math.round(FLAME_H * dpr);
   const ctx2d = els.flame.getContext('2d');
-  ctx2d.setTransform(px, 0, 0, px, 0, 0);
+  ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
   let time = 0;
 
   function drawFlameIndicator(state, dt) {
@@ -44,28 +42,15 @@ export function createHud(els) {
     ctx2d.clearRect(0, 0, FLAME_W, FLAME_H);
 
     const cx = FLAME_W / 2;
-    const cupY = 38;
-
-    // Torch body: tapered handle + gold band, matching the in-game torch hues.
-    ctx2d.strokeStyle = '#8a5a2b';
-    ctx2d.lineCap = 'round';
-    ctx2d.lineWidth = 8;
-    ctx2d.beginPath();
-    ctx2d.moveTo(cx, cupY + 2);
-    ctx2d.lineTo(cx, FLAME_H - 5);
-    ctx2d.stroke();
-    ctx2d.fillStyle = '#d9a441';
-    ctx2d.beginPath();
-    ctx2d.roundRect(cx - 9, cupY - 4, 18, 8, 3);
-    ctx2d.fill();
+    const baseY = FLAME_H - 6; // the flame stands on the capsule's midline area
 
     if (state.flame.state === FLAME_STATE.EXTINGUISHED) {
       // A faint smoke wisp where the flame was.
-      ctx2d.strokeStyle = 'rgba(200,200,200,0.5)';
+      ctx2d.strokeStyle = 'rgba(200,200,200,0.6)';
       ctx2d.lineWidth = 2;
       ctx2d.beginPath();
-      ctx2d.moveTo(cx, cupY - 8);
-      ctx2d.quadraticCurveTo(cx + 5, cupY - 16, cx - 2, cupY - 22);
+      ctx2d.moveTo(cx, baseY - 4);
+      ctx2d.quadraticCurveTo(cx + 6, baseY - 16, cx - 2, baseY - 26);
       ctx2d.stroke();
       return;
     }
@@ -79,9 +64,9 @@ export function createHud(els) {
       1 + flickerAmp * Math.sin(time * 13 + Math.sin(time * 7) * 2) * (0.7 + 0.3 * Math.random());
 
     // Size and hue track remaining energy: tall golden blaze -> small red ember.
-    const flameH = (9 + 21 * level) * flicker;
+    const flameH = (12 + 24 * level) * flicker;
     const hue = 10 + 38 * level; // red-ish 10 -> golden 48
-    const coreY = cupY - 7 - flameH * 0.45;
+    const coreY = baseY - 2 - flameH * 0.45;
 
     if (critical) {
       // Pulsing warning halo, in step with the on-canvas red vignette.
@@ -105,9 +90,9 @@ export function createHud(els) {
     ctx2d.fill();
 
     ctx2d.fillStyle = `hsl(${hue}, 95%, ${44 + 14 * level}%)`;
-    drawTeardrop(cx, cupY - 5, flameH, flameH * 0.42);
+    drawTeardrop(cx, baseY, flameH, flameH * 0.42);
     ctx2d.fillStyle = `hsl(${hue + 8}, 100%, ${70 + 8 * level}%)`;
-    drawTeardrop(cx, cupY - 5, flameH * 0.55, flameH * 0.24);
+    drawTeardrop(cx, baseY, flameH * 0.55, flameH * 0.24);
   }
 
   /** A flame-shaped teardrop standing on baseY: round belly, pinched tip. */

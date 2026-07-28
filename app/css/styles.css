@@ -87,27 +87,31 @@ body {
   flex: none;
 }
 
-/* Torch-and-flame health indicator: the flame's size, color, and flicker are
-   drawn per frame by ui/hud.js; the bar beside it keeps the exact reading. */
+/* Unified flame-health capsule: the animated flame (drawn per frame by
+   ui/hud.js) sits at the left end of one dark pill, with the integrity bar
+   filling the rest — a single connected control, not two elements. */
 .hud-flame-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 4px;
+  padding: 3px 12px 3px 5px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  border-radius: 999px;
 }
 
 .hud-flame {
-  width: 57.5px;
-  height: 80px;
+  width: 38px;
+  height: 46px;
   flex: none;
 }
 
 .hud-gauge {
-  height: 14px;
-  width: min(280px, 42vw);
-  border: 2px solid rgba(255, 255, 255, 0.7);
-  border-radius: 8px;
+  height: 12px;
+  width: min(240px, 38vw);
+  border-radius: 999px;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .hud-gauge-fill {
