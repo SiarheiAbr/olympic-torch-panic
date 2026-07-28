@@ -13,6 +13,21 @@ test.describe('smoke', () => {
     await expect(page.locator('#hud-environment')).toHaveText('Countryside Send-off');
   });
 
+  test('flame health indicator renders in the HUD during a run', async ({ page }) => {
+    await page.goto('/?seed=42');
+    await page.click('#btn-start');
+    await expect(page.locator('#hud-flame')).toBeVisible();
+    await page.waitForTimeout(400);
+    // the canvas must actually be painted (some non-transparent pixels)
+    const painted = await page.locator('#hud-flame').evaluate((el) => {
+      const canvas = /** @type {HTMLCanvasElement} */ (el);
+      const data = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+      for (let i = 3; i < data.length; i += 4) if (data[i] > 0) return true;
+      return false;
+    });
+    expect(painted).toBe(true);
+  });
+
   test('distance accrues automatically', async ({ page }) => {
     await page.goto('/?seed=42');
     await page.click('#btn-start');
