@@ -57,6 +57,7 @@ const hud = createHud({
   environment: $('hud-environment'),
   gauge: $('hud-gauge'),
   gaugeFill: $('hud-gauge-fill'),
+  flame: /** @type {HTMLCanvasElement} */ ($('hud-flame')),
   banner: $('hud-banner'),
 });
 const screens = createScreens({
@@ -177,7 +178,7 @@ let fps = 0;
 
 function render(s, dt) {
   renderer.render(s, dt);
-  if (s.session !== SESSION.MAIN_MENU) hud.update(s);
+  if (s.session !== SESSION.MAIN_MENU) hud.update(s, dt);
   const countdownTick = screens.update(s);
   if (countdownTick !== null) audio.countdownTick();
 

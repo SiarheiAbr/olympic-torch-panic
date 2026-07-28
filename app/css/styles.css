@@ -77,8 +77,22 @@ body {
   display: none;
 }
 
+/* Torch-and-flame health indicator: the flame's size, color, and flicker are
+   drawn per frame by ui/hud.js; the bar beside it keeps the exact reading. */
+.hud-flame-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.hud-flame {
+  width: 46px;
+  height: 64px;
+  flex: none;
+}
+
 .hud-gauge {
-  margin-top: 8px;
   height: 14px;
   width: min(360px, 60vw);
   border: 2px solid rgba(255, 255, 255, 0.7);
