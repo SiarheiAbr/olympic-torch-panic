@@ -38,7 +38,7 @@ describe('run lifecycle', () => {
     assert.ok(Math.abs(state.run.elapsedTime - 2) < 0.01);
   });
 
-  it('REQ-RUN-011: victory survival times differ between runs (per-stage speed jitter)', () => {
+  it('REQ-RUN-012: victory survival times differ between runs (per-stage speed jitter)', () => {
     const times = new Set();
     for (const seed of [1, 2, 3]) {
       const state = makeRunningState();

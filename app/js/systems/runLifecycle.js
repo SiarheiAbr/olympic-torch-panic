@@ -36,7 +36,7 @@ export function currentEnvironment(state) {
  */
 export function startRun(state) {
   state.session = SESSION.RUNNING;
-  // speedFactor 0 = not yet drawn; the first update() draws it (REQ-RUN-011).
+  // speedFactor 0 = not yet drawn; the first update() draws it (REQ-RUN-012).
   // Drawn lazily so startRun stays callable without a random source.
   state.run = { distance: 0, elapsedTime: 0, environmentIndex: 0, speedFactor: 0, outcome: null };
   state.torch.angle = TORCH_START_ANGLE;
@@ -53,7 +53,7 @@ export function startRun(state) {
 /**
  * REQ-RUN-002/003/004/005: distance and time accrue only while RUNNING;
  * environment derives from distance and its change shows a banner cue.
- * REQ-RUN-011: each stage runs at a per-run random speed factor so survival
+ * REQ-RUN-012: each stage runs at a per-run random speed factor so survival
  * times differ between runs of equal skill.
  * @param {import('../core/state.js').GameState} state
  * @param {number} dt
