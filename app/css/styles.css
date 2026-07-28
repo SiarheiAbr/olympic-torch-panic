@@ -77,24 +77,33 @@ body {
   display: none;
 }
 
+/* Right-hand HUD column: location label on top, torch-and-flame health
+   indicator directly beneath it, both flush with the screen's right edge. */
+.hud-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex: none;
+}
+
 /* Torch-and-flame health indicator: the flame's size, color, and flicker are
    drawn per frame by ui/hud.js; the bar beside it keeps the exact reading. */
 .hud-flame-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 4px;
 }
 
 .hud-flame {
-  width: 46px;
-  height: 64px;
+  width: 57.5px;
+  height: 80px;
   flex: none;
 }
 
 .hud-gauge {
   height: 14px;
-  width: min(360px, 60vw);
+  width: min(280px, 42vw);
   border: 2px solid rgba(255, 255, 255, 0.7);
   border-radius: 8px;
   overflow: hidden;

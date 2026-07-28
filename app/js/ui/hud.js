@@ -15,9 +15,11 @@ const GAUGE_CLASS_BY_FLAME_STATE = {
   [FLAME_STATE.EXTINGUISHED]: 'gauge-critical',
 };
 
-// Logical drawing size of the indicator (CSS px; must match .hud-flame).
+// Logical drawing size of the indicator; on screen it is upscaled by
+// FLAME_SCALE (CSS .hud-flame must equal logical size x scale).
 const FLAME_W = 46;
 const FLAME_H = 64;
+const FLAME_SCALE = 1.25;
 
 /**
  * @param {Object} els
@@ -30,11 +32,11 @@ const FLAME_H = 64;
  * @param {HTMLElement} els.banner
  */
 export function createHud(els) {
-  const dpr = window.devicePixelRatio || 1;
-  els.flame.width = Math.round(FLAME_W * dpr);
-  els.flame.height = Math.round(FLAME_H * dpr);
+  const px = (window.devicePixelRatio || 1) * FLAME_SCALE;
+  els.flame.width = Math.round(FLAME_W * px);
+  els.flame.height = Math.round(FLAME_H * px);
   const ctx2d = els.flame.getContext('2d');
-  ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx2d.setTransform(px, 0, 0, px, 0, 0);
   let time = 0;
 
   function drawFlameIndicator(state, dt) {
