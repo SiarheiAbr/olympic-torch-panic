@@ -71,13 +71,18 @@ export function createHud(els) {
     const coreY = baseY - 2 - flameH * 0.45;
 
     if (critical) {
-      // Pulsing warning halo, in step with the on-canvas red vignette.
+      // Pulsing warning halo, in step with the on-canvas red vignette. Radius
+      // is capped inside the canvas so the falloff reaches zero before any
+      // edge — otherwise the clip prints a hard red seam on the bar.
       const pulse = 0.5 + 0.5 * Math.sin(time * 6);
-      const halo = ctx2d.createRadialGradient(cx, coreY, 2, cx, coreY, 20 + 5 * pulse);
+      const haloR = Math.min(14 + 4 * pulse, FLAME_W / 2 - 1);
+      const halo = ctx2d.createRadialGradient(cx, coreY, 2, cx, coreY, haloR);
       halo.addColorStop(0, `rgba(255,60,40,${(0.25 + 0.3 * pulse).toFixed(3)})`);
       halo.addColorStop(1, 'rgba(255,60,40,0)');
       ctx2d.fillStyle = halo;
-      ctx2d.fillRect(0, 0, FLAME_W, FLAME_H);
+      ctx2d.beginPath();
+      ctx2d.arc(cx, coreY, haloR, 0, Math.PI * 2);
+      ctx2d.fill();
     }
 
     // Subtle glow so the flame reads as alive against the dark bar; radius is
