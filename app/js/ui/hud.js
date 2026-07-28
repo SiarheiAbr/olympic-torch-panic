@@ -42,15 +42,14 @@ export function createHud(els) {
     ctx2d.clearRect(0, 0, FLAME_W, FLAME_H);
 
     const cx = FLAME_W / 2;
-    const baseY = FLAME_H - 6; // the flame stands on the capsule's midline area
 
     if (state.flame.state === FLAME_STATE.EXTINGUISHED) {
       // A faint smoke wisp where the flame was.
       ctx2d.strokeStyle = 'rgba(200,200,200,0.6)';
       ctx2d.lineWidth = 2;
       ctx2d.beginPath();
-      ctx2d.moveTo(cx, baseY - 4);
-      ctx2d.quadraticCurveTo(cx + 6, baseY - 16, cx - 2, baseY - 26);
+      ctx2d.moveTo(cx, FLAME_H / 2 + 10);
+      ctx2d.quadraticCurveTo(cx + 6, FLAME_H / 2 - 2, cx - 2, FLAME_H / 2 - 12);
       ctx2d.stroke();
       return;
     }
@@ -66,6 +65,9 @@ export function createHud(els) {
     // Size and hue track remaining energy: tall golden blaze -> small red ember.
     const flameH = (12 + 24 * level) * flicker;
     const hue = 10 + 38 * level; // red-ish 10 -> golden 48
+    // The flame stays vertically centered on the bar's midline, so a small
+    // ember still reads as attached to the pill rather than hanging below it.
+    const baseY = FLAME_H / 2 + flameH / 2;
     const coreY = baseY - 2 - flameH * 0.45;
 
     if (critical) {
@@ -78,24 +80,30 @@ export function createHud(els) {
       ctx2d.fillRect(0, 0, FLAME_W, FLAME_H);
     }
 
-    // Layered teardrop flame: outer glow, body, hot core. The glow radius is
+    // Subtle glow so the flame reads as alive against the dark bar; radius is
     // capped just inside the canvas so its falloff never clips into a square.
     const glowR = Math.min(flameH * 1.15, FLAME_W / 2 - 1);
     const glow = ctx2d.createRadialGradient(cx, coreY, 1, cx, coreY, glowR);
-    glow.addColorStop(0, `hsla(${hue}, 100%, 62%, ${0.5 + 0.35 * level})`);
+    glow.addColorStop(0, `hsla(${hue}, 100%, 60%, ${0.3 + 0.25 * level})`);
     glow.addColorStop(1, `hsla(${hue}, 100%, 50%, 0)`);
     ctx2d.fillStyle = glow;
     ctx2d.beginPath();
     ctx2d.arc(cx, coreY, glowR, 0, Math.PI * 2);
     ctx2d.fill();
 
-    ctx2d.fillStyle = `hsl(${hue}, 95%, ${44 + 14 * level}%)`;
+    // Emoji-style flame, colored by health: bright yellow/orange when full,
+    // darker and redder as it drains, deep red near critical.
+    ctx2d.fillStyle = `hsl(${hue}, 95%, ${34 + 24 * level}%)`;
     drawTeardrop(cx, baseY, flameH, flameH * 0.42);
-    ctx2d.fillStyle = `hsl(${hue + 8}, 100%, ${70 + 8 * level}%)`;
+    ctx2d.strokeStyle = `hsl(${Math.max(0, hue - 6)}, 90%, ${24 + 16 * level}%)`;
+    ctx2d.lineWidth = 1.5;
+    ctx2d.stroke();
+    ctx2d.fillStyle = `hsl(${hue + 8}, 100%, ${52 + 26 * level}%)`;
     drawTeardrop(cx, baseY, flameH * 0.55, flameH * 0.24);
   }
 
-  /** A flame-shaped teardrop standing on baseY: round belly, pinched tip. */
+  /** A flame-shaped teardrop standing on baseY: round belly, pinched tip.
+   *  Fills the shape and leaves the path set for an optional rim stroke. */
   function drawTeardrop(cx, baseY, height, halfWidth) {
     ctx2d.beginPath();
     ctx2d.moveTo(cx, baseY - height);
