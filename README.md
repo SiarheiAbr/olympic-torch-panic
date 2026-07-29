@@ -9,6 +9,9 @@ Plain HTML/CSS/JavaScript. No engines, no frameworks, no build step, zero
 runtime dependencies. The deployable artifact is the repository root itself
 (`index.html` + `css/` + `js/`) — ready for GitHub Pages.
 
+<img width="1903" height="798" alt="image" src="https://github.com/user-attachments/assets/8e615daa-0838-463b-b9b3-433417d7eff9" />
+
+
 ## Controls
 
 | Platform | Control |
