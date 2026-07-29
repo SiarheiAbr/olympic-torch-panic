@@ -10,5 +10,5 @@
     "noImplicitAny": false,
     "lib": ["es2022", "dom"]
   },
-  "include": ["app/js/**/*.js"]
+  "include": ["js/**/*.js"]
 }

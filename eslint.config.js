@@ -1,6 +1,6 @@
 import js from '@eslint/js';
 
-const LOGIC_FOLDERS = ['app/js/core/**/*.js', 'app/js/systems/**/*.js'];
+const LOGIC_FOLDERS = ['js/core/**/*.js', 'js/systems/**/*.js'];
 
 export default [
   js.configs.recommended,

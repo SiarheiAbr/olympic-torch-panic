@@ -7,10 +7,10 @@ import {
   START_GRACE,
   RESUME_COUNTDOWN,
   SPEED_JITTER,
-} from '../../app/js/core/tuning.js';
-import { SESSION, OUTCOME, HAZARD_STATE, createInitialState } from '../../app/js/core/state.js';
-import * as runLifecycle from '../../app/js/systems/runLifecycle.js';
-import { step } from '../../app/js/core/loop.js';
+} from '../../js/core/tuning.js';
+import { SESSION, OUTCOME, HAZARD_STATE, createInitialState } from '../../js/core/state.js';
+import * as runLifecycle from '../../js/systems/runLifecycle.js';
+import { step } from '../../js/core/loop.js';
 import { makeCtx, makeRunningState, simulate } from '../helpers/sim.js';
 
 describe('run lifecycle', () => {

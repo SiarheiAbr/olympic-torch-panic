@@ -1,10 +1,10 @@
 // @ts-check
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { KEY_ROTATION_SPEED, ENVIRONMENTS } from '../../app/js/core/tuning.js';
-import { SESSION } from '../../app/js/core/state.js';
-import * as torchControl from '../../app/js/systems/torchControl.js';
-import { step } from '../../app/js/core/loop.js';
+import { KEY_ROTATION_SPEED, ENVIRONMENTS } from '../../js/core/tuning.js';
+import { SESSION } from '../../js/core/state.js';
+import * as torchControl from '../../js/systems/torchControl.js';
+import { step } from '../../js/core/loop.js';
 import { makeCtx, makeRunningState } from '../helpers/sim.js';
 
 describe('torch control', () => {

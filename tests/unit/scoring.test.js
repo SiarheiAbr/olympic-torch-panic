@@ -1,10 +1,10 @@
 // @ts-check
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { LEADERBOARD_SIZE } from '../../app/js/core/tuning.js';
-import { OUTCOME } from '../../app/js/core/state.js';
-import * as scoring from '../../app/js/systems/scoring.js';
-import { emptySaveDoc } from '../../app/js/storage/saveStore.js';
+import { LEADERBOARD_SIZE } from '../../js/core/tuning.js';
+import { OUTCOME } from '../../js/core/state.js';
+import * as scoring from '../../js/systems/scoring.js';
+import { emptySaveDoc } from '../../js/storage/saveStore.js';
 import { makeNowSequence } from '../helpers/sim.js';
 
 function run(distance, elapsedTime, outcome = OUTCOME.EXTINGUISHED) {

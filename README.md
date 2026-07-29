@@ -6,7 +6,8 @@ rain, drones, beach balls, fireworks). Unblocked hazards drain the flame;
 at zero it goes out. Reach 5,000 m with the flame alive to win.
 
 Plain HTML/CSS/JavaScript. No engines, no frameworks, no build step, zero
-runtime dependencies. The deployable artifact is the static `app/` folder.
+runtime dependencies. The deployable artifact is the repository root itself
+(`index.html` + `css/` + `js/`) — ready for GitHub Pages.
 
 ## Controls
 
@@ -26,7 +27,7 @@ game itself is static files).
 
 ```bash
 npm install
-npm run dev        # serves app/ at http://localhost:8080
+npm run dev        # serves the repo root at http://localhost:8080
 ```
 
 ES modules require an HTTP origin — opening `index.html` via `file://` will
@@ -47,17 +48,23 @@ npm run format:check
 
 ## Deploy
 
-Upload `app/` to any static host (HTTPS, correct `Content-Type` for `.js`).
-Reference target: AWS S3 + CloudFront with full invalidation on deploy.
+The game is served straight from the repository root: point GitHub Pages at
+the root of this repo (or upload `index.html`, `css/`, and `js/` to any
+static host with HTTPS and correct `Content-Type` for `.js`). `tests/`,
+`scripts/`, and config files are dev-only and harmless if published.
 
 ## Structure
 
 ```
-app/js/
+index.html
+css/         styles.css
+js/
   core/      tuning (all gameplay numbers), state, loop, rng, angles
   systems/   runLifecycle, torchControl, hazardSystem, flameIntegrity, scoring
   ui/        input, renderer (canvas), screens, hud, audio
   storage/   saveStore (localStorage: otp.save.v1)
+tests/       unit + integration (node:test) and e2e (Playwright)
+scripts/     dev tooling (stop.mjs)
 ```
 
 Game logic (`core/`, `systems/`) is DOM-free and deterministic (injected RNG

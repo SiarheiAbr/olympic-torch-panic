@@ -1,9 +1,9 @@
 // @ts-check
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { REGEN_RATE, REGEN_DELAY, HAZARD_TYPES } from '../../app/js/core/tuning.js';
-import { FLAME_STATE, HAZARD_STATE, deriveFlameState } from '../../app/js/core/state.js';
-import * as flameIntegrity from '../../app/js/systems/flameIntegrity.js';
+import { REGEN_RATE, REGEN_DELAY, HAZARD_TYPES } from '../../js/core/tuning.js';
+import { FLAME_STATE, HAZARD_STATE, deriveFlameState } from '../../js/core/state.js';
+import * as flameIntegrity from '../../js/systems/flameIntegrity.js';
 import { makeRunningState } from '../helpers/sim.js';
 
 /** Crafted hazard carrying this frame's exposure data, as hazardSystem produces it. */

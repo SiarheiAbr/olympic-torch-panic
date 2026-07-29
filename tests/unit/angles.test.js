@@ -1,7 +1,7 @@
 // @ts-check
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { clampAngle, isBlocked } from '../../app/js/core/angles.js';
+import { clampAngle, isBlocked } from '../../js/core/angles.js';
 
 describe('angles', () => {
   it('REQ-DM-003: clamps to 0-180', () => {
