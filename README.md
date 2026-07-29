@@ -7,7 +7,7 @@ at zero it goes out. Reach 5,000 m with the flame alive to win.
 
 Plain HTML/CSS/JavaScript. No engines, no frameworks, no build step, zero
 runtime dependencies. The deployable artifact is the repository root itself
-(`index.html` + `css/` + `js/`) — ready for GitHub Pages.
+(`index.html` + `css/` + `js/` + `assets/`) — ready for GitHub Pages.
 
 <img width="1903" height="798" alt="image" src="https://github.com/user-attachments/assets/8e615daa-0838-463b-b9b3-433417d7eff9" />
 
@@ -52,8 +52,8 @@ npm run format:check
 ## Deploy
 
 The game is served straight from the repository root: point GitHub Pages at
-the root of this repo (or upload `index.html`, `css/`, and `js/` to any
-static host with HTTPS and correct `Content-Type` for `.js`). `tests/`,
+the root of this repo (or upload `index.html`, `css/`, `js/`, and `assets/`
+to any static host with HTTPS and correct `Content-Type` for `.js`). `tests/`,
 `scripts/`, and config files are dev-only and harmless if published.
 
 ## Structure
@@ -61,6 +61,7 @@ static host with HTTPS and correct `Content-Type` for `.js`). `tests/`,
 ```
 index.html
 css/         styles.css
+assets/      favicon.svg
 js/
   core/      tuning (all gameplay numbers), state, loop, rng, angles
   systems/   runLifecycle, torchControl, hazardSystem, flameIntegrity, scoring
