@@ -1,10 +1,10 @@
 // @ts-check
 // Deterministic simulation helpers for unit/integration tests (conventions.md).
 
-import { createRng } from '../../app/js/core/rng.js';
-import { createInitialState } from '../../app/js/core/state.js';
-import { step } from '../../app/js/core/loop.js';
-import * as runLifecycle from '../../app/js/systems/runLifecycle.js';
+import { createRng } from '../../js/core/rng.js';
+import { createInitialState } from '../../js/core/state.js';
+import { step } from '../../js/core/loop.js';
+import * as runLifecycle from '../../js/systems/runLifecycle.js';
 
 /** @param {number} [seed] */
 export function makeCtx(seed = 42) {
@@ -20,9 +20,9 @@ export function makeRunningState() {
 
 /**
  * Advances the full simulation in fixed steps (default ~60 fps).
- * @param {import('../../app/js/core/state.js').GameState} state
+ * @param {import('../../js/core/state.js').GameState} state
  * @param {number} seconds
- * @param {{rng: import('../../app/js/core/rng.js').Rng}} ctx
+ * @param {{rng: import('../../js/core/rng.js').Rng}} ctx
  * @param {number} [stepS]
  */
 export function simulate(state, seconds, ctx, stepS = 1 / 60) {

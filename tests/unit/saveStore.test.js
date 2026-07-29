@@ -1,7 +1,7 @@
 // @ts-check
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { createSaveStore, emptySaveDoc } from '../../app/js/storage/saveStore.js';
+import { createSaveStore, emptySaveDoc } from '../../js/storage/saveStore.js';
 
 function fakeStorage(initial = {}) {
   const map = new Map(Object.entries(initial));

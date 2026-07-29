@@ -1,7 +1,7 @@
 // @ts-check
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { createRng } from '../../app/js/core/rng.js';
+import { createRng } from '../../js/core/rng.js';
 
 describe('rng', () => {
   it('is deterministic for a given seed', () => {

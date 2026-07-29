@@ -1,15 +1,10 @@
 // @ts-check
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import {
-  HAZARD_TYPES,
-  ENVIRONMENTS,
-  START_GRACE,
-  DEFLECT_LINGER,
-} from '../../app/js/core/tuning.js';
-import { HAZARD_STATE } from '../../app/js/core/state.js';
-import * as hazardSystem from '../../app/js/systems/hazardSystem.js';
-import { createRng } from '../../app/js/core/rng.js';
+import { HAZARD_TYPES, ENVIRONMENTS, START_GRACE, DEFLECT_LINGER } from '../../js/core/tuning.js';
+import { HAZARD_STATE } from '../../js/core/state.js';
+import * as hazardSystem from '../../js/systems/hazardSystem.js';
+import { createRng } from '../../js/core/rng.js';
 import { makeCtx, makeRunningState, simulate } from '../helpers/sim.js';
 
 /** Puts the spawner to sleep so crafted hazards can be progressed in isolation. */

@@ -2,11 +2,11 @@
 // Full-frame integration through the loop's fixed update order.
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { TOTAL_DISTANCE, ENVIRONMENTS, HAZARD_TYPES } from '../../app/js/core/tuning.js';
-import { SESSION, OUTCOME, HAZARD_STATE } from '../../app/js/core/state.js';
-import { step } from '../../app/js/core/loop.js';
-import * as runLifecycle from '../../app/js/systems/runLifecycle.js';
-import { isBlocked } from '../../app/js/core/angles.js';
+import { TOTAL_DISTANCE, ENVIRONMENTS, HAZARD_TYPES } from '../../js/core/tuning.js';
+import { SESSION, OUTCOME, HAZARD_STATE } from '../../js/core/state.js';
+import { step } from '../../js/core/loop.js';
+import * as runLifecycle from '../../js/systems/runLifecycle.js';
+import { isBlocked } from '../../js/core/angles.js';
 import { makeCtx, makeRunningState, simulate } from '../helpers/sim.js';
 
 function activeWind(approachAngle) {
