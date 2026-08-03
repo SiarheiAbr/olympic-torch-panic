@@ -9,7 +9,7 @@ body {
   height: 100%;
   overflow: hidden;
   font-family: 'Segoe UI', system-ui, sans-serif;
-  background: #10131a;
+  background: #140d10;
   color: #f3f3f3;
 }
 
@@ -178,12 +178,16 @@ body {
   overflow-y: auto;
 }
 
+/* Warm ember dusk: a faint torch glow bleeding in from the top, over a
+   plum-charcoal fade — echoes the flame/gold accents instead of cold slate. */
 .screen {
-  background: #0d111a;
+  background:
+    radial-gradient(ellipse 130% 60% at 50% -12%, rgba(240, 122, 69, 0.16), transparent 60%),
+    linear-gradient(180deg, #221219 0%, #170e13 55%, #0f090c 100%);
 }
 
 .overlay {
-  background: rgba(10, 14, 22, 0.6);
+  background: rgba(18, 10, 13, 0.6);
 }
 
 .game-title {
@@ -241,7 +245,7 @@ body {
 .overlay-end {
   font-size: clamp(1.6rem, 6vw, 3rem);
   font-weight: 800;
-  background: rgba(10, 14, 22, 0.75);
+  background: rgba(18, 10, 13, 0.75);
 }
 
 .overlay-end.end-victory {
@@ -351,7 +355,7 @@ body {
   bottom: 18px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(20, 24, 34, 0.95);
+  background: rgba(34, 22, 26, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.3);
   padding: 10px 18px;
   border-radius: 10px;
