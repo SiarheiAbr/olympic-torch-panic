@@ -1,3 +1,36 @@
+/* ----------------------------------------------------------------------
+   Olympic Torch Panic — light theme
+   Warm daylight palette built around the torch-orange brand color.
+   Screens (menu / how-to / leaderboard / results) are bright and card
+   based; the in-game HUD keeps light-on-scene styling because it draws
+   over the gameplay canvas, not over a screen background.
+   ---------------------------------------------------------------------- */
+
+:root {
+  /* Surfaces */
+  --bg: #fbf6ee;
+  --bg-glow: rgba(232, 99, 44, 0.1);
+  --card: #ffffff;
+  --card-border: #ece1d2;
+  --card-shadow: 0 1px 2px rgba(46, 32, 22, 0.05), 0 12px 32px rgba(46, 32, 22, 0.09);
+
+  /* Ink */
+  --ink: #2b2018;
+  --ink-soft: #6d5f52;
+  --ink-faint: #98897a;
+
+  /* Brand & semantic accents (dark enough for light backgrounds) */
+  --torch: #e8632c;
+  --torch-bright: #f07a45;
+  --torch-deep: #c94e1d;
+  --gold: #a8650a;
+  --success: #1a7f4b;
+
+  /* Controls */
+  --control-radius: 12px;
+  --focus-ring: 0 0 0 3px rgba(232, 99, 44, 0.3);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -9,8 +42,8 @@ body {
   height: 100%;
   overflow: hidden;
   font-family: 'Segoe UI', system-ui, sans-serif;
-  background: #140d10;
-  color: #f3f3f3;
+  background: var(--bg);
+  color: var(--ink);
 }
 
 #app {
@@ -32,7 +65,7 @@ body {
   display: none !important;
 }
 
-/* ---------- HUD ---------- */
+/* ---------- HUD (drawn over the gameplay canvas, not a screen) ---------- */
 
 #hud {
   position: absolute;
@@ -41,6 +74,7 @@ body {
   right: 0;
   padding: 12px 16px;
   pointer-events: none;
+  color: #f7f7f7;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
@@ -178,78 +212,139 @@ body {
   overflow-y: auto;
 }
 
-/* Warm ember dusk: a faint torch glow bleeding in from the top, over a
-   plum-charcoal fade — echoes the flame/gold accents instead of cold slate. */
+/* Warm daylight: a soft torch glow washing down from the top of a bright,
+   paper-warm page — the light-theme echo of the flame/gold accents. */
 .screen {
   background:
-    radial-gradient(ellipse 130% 60% at 50% -12%, rgba(240, 122, 69, 0.16), transparent 60%),
-    linear-gradient(180deg, #221219 0%, #170e13 55%, #0f090c 100%);
+    radial-gradient(ellipse 130% 55% at 50% -10%, var(--bg-glow), transparent 62%),
+    linear-gradient(180deg, #fdfaf4 0%, var(--bg) 55%, #f4ead9 100%);
 }
 
+.screen h2,
+.overlay h2 {
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+/* Frosted daylight veil over the paused / ending gameplay scene. */
 .overlay {
-  background: rgba(18, 10, 13, 0.6);
+  background: rgba(251, 246, 238, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 .game-title {
   font-size: clamp(1.8rem, 6vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
 .game-tagline {
-  opacity: 0.85;
+  color: var(--ink-soft);
+  font-size: 1.05rem;
 }
 
 .menu-best {
-  font-weight: 600;
-  color: #ffd27a;
+  font-weight: 700;
+  color: var(--gold);
 }
+
+.menu-best:empty {
+  display: none;
+}
+
+/* ---------- Buttons & inputs ---------- */
 
 .btn {
   font: inherit;
-  padding: 10px 26px;
-  border-radius: 10px;
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.08);
-  color: inherit;
+  font-weight: 600;
+  padding: 12px 28px;
+  border-radius: var(--control-radius);
+  border: 1px solid var(--card-border);
+  background: var(--card);
+  color: var(--ink);
   cursor: pointer;
   min-width: 180px;
+  box-shadow:
+    0 1px 2px rgba(46, 32, 22, 0.06),
+    0 4px 12px rgba(46, 32, 22, 0.06);
+  transition:
+    background 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease,
+    transform 120ms ease;
 }
 
 .btn:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: #fff9f1;
+  border-color: #ddccb8;
+  transform: translateY(-1px);
+  box-shadow:
+    0 2px 4px rgba(46, 32, 22, 0.07),
+    0 8px 20px rgba(46, 32, 22, 0.1);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(46, 32, 22, 0.08);
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 .btn-primary {
-  background: #e8632c;
-  border-color: #e8632c;
+  background: linear-gradient(180deg, var(--torch-bright), var(--torch));
+  border-color: var(--torch-deep);
+  color: #fff;
   font-weight: 700;
+  text-shadow: 0 1px 2px rgba(120, 40, 5, 0.25);
+  box-shadow:
+    0 1px 2px rgba(201, 78, 29, 0.25),
+    0 6px 18px rgba(232, 99, 44, 0.35);
 }
 
 .btn-primary:hover {
-  background: #f07a45;
+  background: linear-gradient(180deg, #f68a58, var(--torch-bright));
+  border-color: var(--torch-deep);
+  box-shadow:
+    0 2px 4px rgba(201, 78, 29, 0.28),
+    0 10px 24px rgba(232, 99, 44, 0.42);
+}
+
+.btn-primary:active {
+  background: linear-gradient(180deg, var(--torch), var(--torch-deep));
 }
 
 .controls-help {
   margin-top: 18px;
   font-size: 0.9rem;
-  opacity: 0.75;
+  color: var(--ink-soft);
   line-height: 1.6;
   max-width: 420px;
+}
+
+.controls-help strong {
+  color: var(--ink);
 }
 
 .overlay-countdown span {
   font-size: clamp(4rem, 18vw, 9rem);
   font-weight: 800;
+  color: var(--torch-deep);
   animation: banner-in 0.3s ease-out;
 }
 
 .overlay-end {
   font-size: clamp(1.6rem, 6vw, 3rem);
   font-weight: 800;
-  background: rgba(18, 10, 13, 0.75);
+  background: rgba(251, 246, 238, 0.85);
 }
 
 .overlay-end.end-victory {
-  color: #ffd27a;
+  color: var(--gold);
 }
 
 /* ---------- Results & leaderboard ---------- */
@@ -257,13 +352,17 @@ body {
 .result-distance {
   font-size: clamp(2rem, 8vw, 4rem);
   font-weight: 800;
-  color: #ffd27a;
+  color: var(--torch-deep);
+}
+
+.result-time {
+  color: var(--ink-soft);
 }
 
 .result-badge,
 .result-record {
   font-weight: 700;
-  color: #7ce09a;
+  color: var(--success);
 }
 
 .initials-form {
@@ -274,61 +373,107 @@ body {
 
 .initials-form input {
   font: inherit;
+  font-weight: 700;
   width: 5.5ch;
   text-align: center;
   text-transform: uppercase;
-  padding: 8px;
-  border-radius: 8px;
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.08);
-  color: inherit;
+  padding: 10px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--card-border);
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: inset 0 1px 2px rgba(46, 32, 22, 0.06);
 }
 
+.initials-form input:focus-visible {
+  outline: none;
+  border-color: var(--torch);
+  box-shadow: var(--focus-ring);
+}
+
+.initials-form input::placeholder {
+  color: var(--ink-faint);
+}
+
+/* The table is its own white card: separate borders let the rounded
+   corners clip cleanly without a wrapper element. */
 .board-table {
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   min-width: min(520px, 88vw);
   font-size: 0.95rem;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
 }
 
 .board-table th,
 .board-table td {
-  padding: 6px 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 10px 14px;
+  border-bottom: 1px solid #f1e8db;
 }
 
 .board-table th {
   text-align: left;
-  opacity: 0.7;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  background: #faf5ec;
+}
+
+.board-table tbody tr:nth-child(even) {
+  background: #fdfaf5;
+}
+
+.board-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .board-empty {
-  opacity: 0.7;
+  color: var(--ink-soft);
 }
 
 .leaderboard-record {
-  color: #ffd27a;
-  font-weight: 600;
+  color: var(--gold);
+  font-weight: 700;
 }
 
 /* ---------- How to Play ---------- */
 
 .howto-content {
-  max-width: min(600px, 90vw);
+  max-width: min(640px, 92vw);
   text-align: left;
   font-size: 0.95rem;
-  line-height: 1.55;
+  line-height: 1.6;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+  padding: 22px 26px 24px;
 }
 
 .howto-content h3 {
-  margin-top: 14px;
+  margin-top: 16px;
   margin-bottom: 4px;
-  color: #ffd27a;
+  color: var(--torch-deep);
   font-size: 1.05rem;
+}
+
+.howto-content h3:first-child {
+  margin-top: 0;
 }
 
 .howto-content p {
   margin-bottom: 6px;
-  opacity: 0.9;
+  color: var(--ink-soft);
+}
+
+.howto-content strong {
+  color: var(--ink);
 }
 
 .howto-hazards {
@@ -337,8 +482,8 @@ body {
 }
 
 .howto-hazards li {
-  padding: 2px 0;
-  opacity: 0.9;
+  padding: 3px 0;
+  color: var(--ink-soft);
 }
 
 .results-buttons {
@@ -355,12 +500,14 @@ body {
   bottom: 18px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(34, 22, 26, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: var(--card);
+  color: var(--ink);
+  border: 1px solid var(--card-border);
   padding: 10px 18px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 0.9rem;
   max-width: 90vw;
+  box-shadow: var(--card-shadow);
 }
 
 .debug-overlay {
@@ -369,6 +516,7 @@ body {
   left: 8px;
   font-family: Consolas, monospace;
   font-size: 11px;
+  color: #f3f3f3;
   background: rgba(0, 0, 0, 0.55);
   padding: 6px 8px;
   border-radius: 6px;
